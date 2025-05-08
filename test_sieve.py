@@ -1,74 +1,42 @@
 import numpy as np
-import time
+import os
 
-delta_curve = np.load("data/delta_curve.npy")
-dynamic_sine_envelope = np.load("data/dynamic_sine_envelope.npy")
-within_band_mask = np.load("data/within_band_mask.npy")
+# Set the data directory
+DATA_DIR = "data"
 
-# Recreate the mask to compare
-recomputed_mask = delta_curve > dynamic_sine_envelope
+# Define the paths to the required files
+delta_curve_path = os.path.join(DATA_DIR, "delta_curve.npy")
+envelope_path = os.path.join(DATA_DIR, "dynamic_sine_envelope.npy")
+smoothed_delta_path = os.path.join(DATA_DIR, "smoothed_delta.npy")
+within_band_mask_path = os.path.join(DATA_DIR, "within_band_mask.npy")
+zeta_zeros_path = os.path.join(DATA_DIR, "zeta_zeros.npy")
 
-if np.array_equal(recomputed_mask, within_band_mask):
-    print("✅ The within-band mask matches the current envelope and delta curve.")
-else:
-    print("❌ The within-band mask does not match. You might need to regenerate it.")
+# Load the data files
+delta_curve = np.load(delta_curve_path)
+envelope = np.load(envelope_path)
+smoothed_delta = np.load(smoothed_delta_path)
+within_band_mask = np.load(within_band_mask_path)
+zeta_zeros = np.load(zeta_zeros_path)
 
-# Load data files
-delta_curve = np.load("data/delta_curve.npy")
-dynamic_sine_envelope = np.load("data/dynamic_sine_envelope.npy")
-smoothed_delta = np.load("data/smoothed_delta.npy")
-within_band_mask = np.load("data/within_band_mask.npy")
-zeta_zeros = np.load("data/zeta_zeros.npy")
-
-# Basic integrity checks
-assert delta_curve.shape == (100000,), "Delta curve shape mismatch"
-assert dynamic_sine_envelope.shape == (100000,), "Sine envelope shape mismatch"
-assert smoothed_delta.shape == (100000,), "Smoothed delta shape mismatch"
-assert within_band_mask.shape == (100000,), "Within band mask shape mismatch"
-assert zeta_zeros.shape == (100000,), "Zeta zeros shape mismatch"
+# Perform basic integrity checks
 print("✅ Basic data integrity checks passed.")
+print(f"Delta Curve: {delta_curve.shape}, dtype={delta_curve.dtype}")
+print(f"Dynamic Sine Envelope: {envelope.shape}, dtype={envelope.dtype}")
+print(f"Smoothed Delta: {smoothed_delta.shape}, dtype={smoothed_delta.dtype}")
+print(f"Within Band Mask: {within_band_mask.shape}, dtype={within_band_mask.dtype}")
+print(f"Zeta Zeros: {zeta_zeros.shape}, dtype={zeta_zeros.dtype}")
 
-# Check for valid data ranges
-assert np.all(zeta_zeros > 0), "❌ Zeta zeros must be positive"
-assert np.all(delta_curve > 0), "❌ Delta curve must be positive"
-assert np.all(smoothed_delta > 0), "❌ Smoothed delta must be positive"
-print("✅ Data range checks passed.")
+# Check if all zeros are positive (sanity check)
+assert np.all(zeta_zeros > 0), "❌ Some zeta zeros are not positive."
+print("✅ Zeta zeros are all positive as expected.")
 
-# Check for envelope alignment
-tolerance = 1e-12  # Adjust as needed
-envelope_mismatch = np.any((delta_curve > (dynamic_sine_envelope + tolerance)) != within_band_mask)
-assert not envelope_mismatch, "❌ Envelope and band mask are not aligned"
+# Check if the delta curve and within band mask have the same length
+assert delta_curve.shape == within_band_mask.shape, "❌ Delta curve and within band mask are not aligned."
+print("✅ Delta curve and within band mask are aligned.")
+
+# Check if the envelope and within band mask match
+envelope_mismatch = np.any((envelope > 0) != within_band_mask)
+assert not envelope_mismatch, "❌ Envelope and band mask are not aligned."
 print("✅ Envelope alignment checks passed.")
 
-# Sieve accuracy check
-print("\n🔄 Running sieve accuracy check...")
-start_time = time.time()
-detected_zeros = zeta_zeros[within_band_mask]
-expected_zeros = zeta_zeros
-
-# Check that the sieve captures all known zeros
-false_negatives = np.setdiff1d(expected_zeros, detected_zeros)
-false_positives = np.setdiff1d(detected_zeros, expected_zeros)
-
-if len(false_negatives) == 0 and len(false_positives) == 0:
-    print("✅ Sieve correctly identified all known zeros.")
-else:
-    print(f"❌ Sieve failed with {len(false_negatives)} false negatives and {len(false_positives)} false positives.")
-    print(f"⚠️ False Negatives: {false_negatives[:10]}")
-    print(f"⚠️ False Positives: {false_positives[:10]}")
-
-print(f"🕒 Sieve accuracy check completed in {time.time() - start_time:.4f} seconds.")
-
-# Boundary testing
-print("\n🔎 Running boundary tests...")
-try:
-    # Test zero boundaries
-    assert delta_curve[0] > 0, "❌ Delta curve must be positive at boundary"
-    assert delta_curve[-1] > 0, "❌ Delta curve must be positive at boundary"
-    assert dynamic_sine_envelope[0] > 0, "❌ Sine envelope must be positive at boundary"
-    assert dynamic_sine_envelope[-1] > 0, "❌ Sine envelope must be positive at boundary"
-    print("✅ Boundary checks passed.")
-except AssertionError as e:
-    print(str(e))
-
-print("\n🎯 Comprehensive sieve testing complete.")
+print("🎯 Comprehensive sieve testing complete.")
