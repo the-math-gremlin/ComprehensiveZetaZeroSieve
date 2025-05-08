@@ -37,15 +37,17 @@ def run_sieve(parameters, delta_curve, dynamic_sine_envelope, within_band_mask, 
         else:
             false_negatives.append(zero)
 
-    # Check for false positives
-    for i, is_within_band in enumerate(within_band_mask):
-        if is_within_band and (i not in known_zero_indices):
-            false_positives.append(i)
+    # Check for false positives with a tolerance
+tolerance_radius = int(np.ceil(tolerance * 10))  # adjust this as needed
 
-    # Log results
-    log(f"True Positives: {len(true_positives)}")
-    log(f"False Negatives: {len(false_negatives)}")
-    log(f"False Positives: {len(false_positives)}")
+for i, is_within_band in enumerate(within_band_mask):
+    if is_within_band and not any(abs(i - zero) <= tolerance_radius for zero in known_zero_indices):
+        false_positives.append(i)
+
+# Log results
+log(f"True Positives: {len(true_positives)}")
+log(f"False Negatives: {len(false_negatives)}")
+log(f"False Positives: {len(false_positives)}")
 
     return {
         "True Positives": true_positives,
