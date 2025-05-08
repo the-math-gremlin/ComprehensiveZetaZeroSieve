@@ -3,6 +3,56 @@ import os
 
 # Set the data directory
 DATA_DIR = "data"
+import numpy as np
+
+# Load required data
+delta_curve = np.load("data/delta_curve.npy")
+envelope = np.load("data/dynamic_sine_envelope.npy")
+smoothed_delta = np.load("data/smoothed_delta.npy")
+within_band_mask = np.load("data/within_band_mask.npy")
+zeta_zeros = np.load("data/zeta_zeros.npy")
+
+# Initial checks (already handled by initial_tests.py)
+print("\n🔄 Running additional sieve integrity checks...")
+
+# 1. Boundary Drift Checks
+boundary_issues = []
+t_min = 0
+t_max = len(delta_curve) - 1
+if delta_curve[t_min] < -envelope[t_min] or delta_curve[t_min] > envelope[t_min]:
+    boundary_issues.append(t_min)
+if delta_curve[t_max] < -envelope[t_max] or delta_curve[t_max] > envelope[t_max]:
+    boundary_issues.append(t_max)
+
+if boundary_issues:
+    print(f"❌ Boundary drift errors at indices: {boundary_issues}")
+else:
+    print("✅ Boundary drift checks passed.")
+
+# 2. Harmonic Seed Verification
+missed_zeros = np.loadtxt("data/sample_zeros.csv")
+early_misses = missed_zeros[missed_zeros < 50]
+if len(early_misses) > 0:
+    print(f"⚠️ Harmonic seed verification: {len(early_misses)} early misses detected (t < 50).")
+    print(f"Missed harmonic seeds: {early_misses}")
+else:
+    print("✅ All early zeros correctly classified as harmonic seeds.")
+
+# 3. False Positive Scan
+false_positives = np.where(within_band_mask & (delta_curve < -envelope) | (delta_curve > envelope))[0]
+if len(false_positives) > 0:
+    print(f"❌ False positives detected: {len(false_positives)}")
+else:
+    print("✅ No false positives detected.")
+
+# 4. Sieve Stability Check
+test_passed = np.all(within_band_mask == ((delta_curve > -envelope) & (delta_curve < envelope)))
+if test_passed:
+    print("✅ Sieve stability check passed.")
+else:
+    print("❌ Sieve stability check failed.")
+
+print("\n📝 Sieve integrity checks complete.")
 
 # Define the paths to the required files
 delta_curve_path = os.path.join(DATA_DIR, "delta_curve.npy")
