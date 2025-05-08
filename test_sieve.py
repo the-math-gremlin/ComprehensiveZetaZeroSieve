@@ -1,6 +1,18 @@
 import numpy as np
 import time
 
+delta_curve = np.load("data/delta_curve.npy")
+dynamic_sine_envelope = np.load("data/dynamic_sine_envelope.npy")
+within_band_mask = np.load("data/within_band_mask.npy")
+
+# Recreate the mask to compare
+recomputed_mask = delta_curve > dynamic_sine_envelope
+
+if np.array_equal(recomputed_mask, within_band_mask):
+    print("✅ The within-band mask matches the current envelope and delta curve.")
+else:
+    print("❌ The within-band mask does not match. You might need to regenerate it.")
+
 # Load data files
 delta_curve = np.load("data/delta_curve.npy")
 dynamic_sine_envelope = np.load("data/dynamic_sine_envelope.npy")
