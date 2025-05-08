@@ -35,6 +35,10 @@ def main():
     except Exception as e:
         print(f"Error loading data files: {e}")
         return
+    # Data check
+    if delta_curve.shape != dynamic_sine_envelope.shape or len(within_band_mask) != len(delta_curve):
+    print("Error: Data files are not correctly aligned.")
+    return
 
     # Run the sieve
 try:
