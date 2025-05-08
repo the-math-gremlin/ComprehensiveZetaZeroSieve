@@ -197,6 +197,7 @@ config.py
 *.npy
 *.csv
 *.txt
+!requirements.txt
 
 # Ignore system files
 .DS_Store
