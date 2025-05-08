@@ -1,39 +1,37 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Envelope parameters from the paper
-A = 0.15  # Typical amplitude in the paper's range (0.1 to 0.2)
-f = abs(1 / np.log(3) - 1 / np.log(np.pi))  # Beat frequency from paper
-tolerance = 0.875
-seed_region_length = 50
+# Parameters from the paper
+num_points = 100000
+max_t = 100000  # Corresponds to the maximum t value in the dataset
+t_values = np.linspace(1, max_t, num_points)
 
-# Generate the full envelope
-t = np.arange(1, 100001)
-mu_t = np.log(t)  # Centerline approximation
-envelope = A * np.sin(f * mu_t)
+# Calculate the correct beat frequency
+log_3 = np.log(3)
+log_pi = np.log(np.pi)
+frequency = abs(1/log_3 - 1/log_pi)
 
-# Apply the seed region adjustment
-seed_scale = np.linspace(0.01, A, seed_region_length)
-envelope[:seed_region_length] = seed_scale * np.sin(f * mu_t[:seed_region_length])
+# Corrected amplitude scaling based on the paper
+A0 = 0.15  # Peak amplitude from the paper, adjust if needed
 
-# Save the regenerated envelope
-np.save("data/dynamic_sine_envelope.npy", envelope)
+# Regenerate the dynamic sine envelope
+dynamic_sine_envelope = A0 * (1 - np.exp(-0.01 * t_values ** 0.5)) * np.sin(frequency * t_values)
 
-# Plot the new envelope to verify
-plt.figure(figsize=(14, 8))
-plt.plot(envelope, color='dodgerblue', linewidth=1.2)
-plt.title("Regenerated Dynamic Sine Envelope - Full Range")
+# Save the corrected envelope
+np.save("dynamic_sine_envelope.npy", dynamic_sine_envelope)
+
+# Plot the full range for verification
+plt.figure(figsize=(12, 6))
+plt.plot(t_values, dynamic_sine_envelope, color='blue')
+plt.title("Corrected Dynamic Sine Envelope - Full Range")
 plt.xlabel("Index (t)")
 plt.ylabel("Amplitude")
-plt.grid(True)
 plt.show()
 
-plt.figure(figsize=(14, 8))
-plt.plot(envelope[:500], color='orange', linewidth=1.2)
-plt.title("Regenerated Dynamic Sine Envelope - Seed Region (First 500 Samples)")
+# Plot the seed region separately for detailed inspection
+plt.figure(figsize=(12, 6))
+plt.plot(t_values[:5000], dynamic_sine_envelope[:5000], color='green')
+plt.title("Corrected Dynamic Sine Envelope - Seed Region (t < 5000)")
 plt.xlabel("Index (t)")
 plt.ylabel("Amplitude")
-plt.grid(True)
 plt.show()
-
-print("✅ Successfully regenerated dynamic_sine_envelope.npy")
