@@ -14,6 +14,6 @@ ZETA_ZEROS_FILE = os.path.join(DATA_DIR, "zeta_zeros.npy")
 DEFAULT_PARAMETERS = {
     "Amplitude": 12.2,
     "Frequency": 0.001,
-    "Smoothing Sigma": 5.0,
+    "Smoothing_Sigma": 5.0,
     "Tolerance": 0.875,
 }
