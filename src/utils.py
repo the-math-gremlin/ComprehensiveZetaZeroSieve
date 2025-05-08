@@ -14,9 +14,17 @@ def load_parameters(filepath):
     with open(filepath, "r") as file:
         lines = file.readlines()
         for line in lines:
+            # Split on the first "=" only, in case there are extra "=" signs
             if "=" in line:
-                key, value = line.split("=")
-                parameters[key.strip()] = float(value.strip())
+                key, value = line.split("=", 1)
+                key = key.strip()
+                value = value.strip()
+                
+                # Ensure the value is a valid float
+                try:
+                    parameters[key] = float(value)
+                except ValueError:
+                    print(f"Warning: Could not convert parameter '{key}' to float.")
     return parameters
 
 
