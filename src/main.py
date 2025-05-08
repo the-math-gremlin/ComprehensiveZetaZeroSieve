@@ -37,16 +37,16 @@ def main():
         return
 
     # Run the sieve
-    try:
-        true_positives, false_negatives, false_positives = run_sieve(
-    parameters,
-    delta_curve,
-    dynamic_sine_envelope,
-    within_band_mask,
-    zeta_zeros
-)
-    except Exception as e:
-        print(f"Error running sieve: {e}")
+try:
+    true_positives, false_negatives, false_positives = run_sieve(
+        params,
+        delta_curve,
+        dynamic_sine_envelope,
+        within_band_mask,
+        zeta_zeros
+    )
+except Exception as e:
+    print(f"Error running sieve: {e}")
 
 if __name__ == "__main__":
     main()
