@@ -1,4 +1,5 @@
 import numpy as np
+from utils import log
 
 def run_sieve(parameters, delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros):
     """
@@ -12,9 +13,7 @@ def run_sieve(parameters, delta_curve, dynamic_sine_envelope, within_band_mask, 
     - zeta_zeros (np.ndarray): The known nontrivial zeta zeros.
 
     Returns:
-    - true_positives (list): Zeros correctly identified within the band.
-    - false_negatives (list): Zeros missed by the sieve.
-    - false_positives (list): Points incorrectly identified as zeros.
+    - dict: Dictionary with true positives, false negatives, and false positives.
     """
     amplitude = parameters["Amplitude"]
     frequency = parameters["Frequency"]
@@ -30,17 +29,26 @@ def run_sieve(parameters, delta_curve, dynamic_sine_envelope, within_band_mask, 
         raise ValueError("Delta curve and sine envelope are not aligned.")
 
     # Check each known zero
+    known_zero_indices = set(np.round(zeta_zeros).astype(int))
     for zero in zeta_zeros:
-        index = int(np.round(zero))  # Round to the nearest index
+        index = int(np.round(zero))
         if 0 <= index < len(within_band_mask) and within_band_mask[index]:
             true_positives.append(zero)
         else:
             false_negatives.append(zero)
 
     # Check for false positives
-    known_zero_indices = set(np.round(zeta_zeros).astype(int))
     for i, is_within_band in enumerate(within_band_mask):
         if is_within_band and (i not in known_zero_indices):
             false_positives.append(i)
 
-    return true_positives, false_negatives, false_positives
+    # Log results
+    log(f"True Positives: {len(true_positives)}")
+    log(f"False Negatives: {len(false_negatives)}")
+    log(f"False Positives: {len(false_positives)}")
+
+    return {
+        "True Positives": true_positives,
+        "False Negatives": false_negatives,
+        "False Positives": false_positives,
+    }
