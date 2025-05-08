@@ -7,7 +7,7 @@ dynamic_sine_envelope = np.load("dynamic_sine_envelope.npy")
 smoothed_delta = np.load("smoothed_delta.npy")
 within_band_mask = np.load("within_band_mask.npy")
 zeta_zeros = np.load("zeta_zeros.npy")
-known_zeros = np.load("data/zeta_zeros.npy")
+known_zeros = np.load("zeta_zeros.npy")
 
 print(f"Loaded {len(known_zeros)} known zeros.")
 
