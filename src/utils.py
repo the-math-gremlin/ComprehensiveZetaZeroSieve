@@ -1,19 +1,9 @@
 import os
 
 def load_parameters(filepath):
-    """
-    Loads the sieve parameters from a text file.
-
-    Parameters:
-    - filepath (str): Path to the parameter file.
-
-    Returns:
-    - dict: Dictionary of parameters.
-    """
     parameters = {}
     with open(filepath, "r") as file:
         for line in file:
-            # Allow both "=" and ":" as separators
             if "=" in line:
                 key, value = line.split("=", 1)
             elif ":" in line:
@@ -21,16 +11,18 @@ def load_parameters(filepath):
             else:
                 continue
             
-            # Remove leading and trailing whitespace
             key = key.strip().replace(" ", "_")
             value = value.strip()
             
-            # Convert the value to float if possible
+            # Print each key-value pair as it is loaded
+            print(f"Loading parameter: {key} = {value}")
+            
             try:
                 parameters[key] = float(value)
             except ValueError:
                 print(f"Warning: Could not convert parameter '{key}' to float.")
 
+    print("Final Parameters:", parameters)
     return parameters
     
 
