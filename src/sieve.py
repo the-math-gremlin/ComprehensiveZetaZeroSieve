@@ -28,12 +28,12 @@ def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, 
         raise ValueError("Delta curve and sine envelope are not aligned.")
 
     # Check each known zero
-    for zero in zeta_zeros:
-        index = int(zero)  # Assuming the zeros are indexed directly
-        if index < len(within_band_mask) and within_band_mask[index]:
-            true_positives.append(zero)
-        else:
-            false_negatives.append(zero)
+for zero in zeta_zeros:
+    index = int(np.round(zero))  # Round to the nearest index
+    if 0 <= index < len(within_band_mask) and within_band_mask[index]:
+        true_positives.append(zero)
+    else:
+        false_negatives.append(zero)
 
     # Identify false positives
     for i, in_band in enumerate(within_band_mask):
