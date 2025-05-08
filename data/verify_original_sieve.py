@@ -7,7 +7,9 @@ dynamic_sine_envelope = np.load("dynamic_sine_envelope.npy")
 smoothed_delta = np.load("smoothed_delta.npy")
 within_band_mask = np.load("within_band_mask.npy")
 zeta_zeros = np.load("zeta_zeros.npy")
-known_zeros = np.loadtxt("zeros1.gz")
+known_zeros = np.load("data/zeta_zeros.npy")
+
+print(f"Loaded {len(known_zeros)} known zeros.")
 
 # Extract the sieve parameters from the text file
 with open("sieve_parameters.txt", "r") as f:
