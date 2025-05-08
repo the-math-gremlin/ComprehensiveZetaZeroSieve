@@ -38,11 +38,13 @@ def main():
 
     # Run the sieve
     try:
-        true_positives, false_negatives, false_positives = run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, amplitude, frequency, sigma, tolerance)
-        print("\n🗸 Sieve Run Complete")
-        print(f"True Positives: {len(true_positives)}")
-        print(f"False Negatives: {len(false_negatives)}")
-        print(f"False Positives: {len(false_positives)}")
+        true_positives, false_negatives, false_positives = run_sieve(
+    parameters,
+    delta_curve,
+    dynamic_sine_envelope,
+    within_band_mask,
+    zeta_zeros
+)
     except Exception as e:
         print(f"Error running sieve: {e}")
 
