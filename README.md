@@ -11,11 +11,15 @@ A comprehensive zeta zero sieve app with advanced features like real-time visual
 
 ## Installation
 Clone this repository and run:
+```bash
 git clone https://github.com/the-math-gremlin/ComprehensiveZetaZeroSieve
 cd ComprehensiveZetaZeroSieve
+```
 
 ## Usage
+```bash
 python main.py
+```
 
 ## Contributing
 Pull requests and feature suggestions are welcome!
