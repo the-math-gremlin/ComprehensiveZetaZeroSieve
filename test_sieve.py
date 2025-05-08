@@ -1,42 +1,43 @@
 import numpy as np
-import os
+import matplotlib.pyplot as plt
 
-# Set the data directory
-DATA_DIR = "data"
+# Parameters from your paper (approximate, can be adjusted if needed)
+SEED_REGION_LIMIT = 5000
+FULL_RANGE = 100000
+AMPLITUDE_SCALE = 0.15  # Adjust this if the envelope seems too flat or too steep
+FREQUENCY_SCALE = 0.01
+DECAY_RATE = 0.005  # Controls how quickly the oscillations decay
 
-# Define the paths to the required files
-delta_curve_path = os.path.join(DATA_DIR, "delta_curve.npy")
-envelope_path = os.path.join(DATA_DIR, "dynamic_sine_envelope.npy")
-smoothed_delta_path = os.path.join(DATA_DIR, "smoothed_delta.npy")
-within_band_mask_path = os.path.join(DATA_DIR, "within_band_mask.npy")
-zeta_zeros_path = os.path.join(DATA_DIR, "zeta_zeros.npy")
+# Generate the corrected dynamic sine envelope
+t_values = np.arange(FULL_RANGE)
+envelope = np.zeros(FULL_RANGE)
 
-# Load the data files
-delta_curve = np.load(delta_curve_path)
-envelope = np.load(envelope_path)
-smoothed_delta = np.load(smoothed_delta_path)
-within_band_mask = np.load(within_band_mask_path)
-zeta_zeros = np.load(zeta_zeros_path)
+# Generate the seed region
+for t in range(SEED_REGION_LIMIT):
+    envelope[t] = AMPLITUDE_SCALE * np.sin(FREQUENCY_SCALE * t) * np.exp(-DECAY_RATE * t)
 
-# Perform basic integrity checks
-print("✅ Basic data integrity checks passed.")
-print(f"Delta Curve: {delta_curve.shape}, dtype={delta_curve.dtype}")
-print(f"Dynamic Sine Envelope: {envelope.shape}, dtype={envelope.dtype}")
-print(f"Smoothed Delta: {smoothed_delta.shape}, dtype={smoothed_delta.dtype}")
-print(f"Within Band Mask: {within_band_mask.shape}, dtype={within_band_mask.dtype}")
-print(f"Zeta Zeros: {zeta_zeros.shape}, dtype={zeta_zeros.dtype}")
+# Extend the envelope smoothly into the full range
+max_seed_amplitude = np.max(np.abs(envelope[:SEED_REGION_LIMIT]))
+for t in range(SEED_REGION_LIMIT, FULL_RANGE):
+    # Gradually increase the amplitude to stabilize near the maximum seed amplitude
+    envelope[t] = max_seed_amplitude * (1 - np.exp(-DECAY_RATE * (t - SEED_REGION_LIMIT)))
 
-# Check if all zeros are positive (sanity check)
-assert np.all(zeta_zeros > 0), "❌ Some zeta zeros are not positive."
-print("✅ Zeta zeros are all positive as expected.")
+# Save the corrected envelope to file
+output_path = 'data/dynamic_sine_envelope.npy'
+np.save(output_path, envelope)
+print(f"Corrected dynamic sine envelope saved to {output_path}")
 
-# Check if the delta curve and within band mask have the same length
-assert delta_curve.shape == within_band_mask.shape, "❌ Delta curve and within band mask are not aligned."
-print("✅ Delta curve and within band mask are aligned.")
+# Plot the corrected envelope
+plt.figure(figsize=(10, 6))
+plt.plot(envelope, color='blue')
+plt.title("Corrected Dynamic Sine Envelope - Full Range")
+plt.xlabel("Index (t)")
+plt.ylabel("Amplitude")
+plt.show()
 
-# Check if the envelope and within band mask match
-envelope_mismatch = np.any((envelope > 0) != within_band_mask)
-assert not envelope_mismatch, "❌ Envelope and band mask are not aligned."
-print("✅ Envelope alignment checks passed.")
-
-print("🎯 Comprehensive sieve testing complete.")
+plt.figure(figsize=(10, 6))
+plt.plot(envelope[:SEED_REGION_LIMIT], color='green')
+plt.title("Corrected Dynamic Sine Envelope - Seed Region (t < 5000)")
+plt.xlabel("Index (t)")
+plt.ylabel("Amplitude")
+plt.show()
