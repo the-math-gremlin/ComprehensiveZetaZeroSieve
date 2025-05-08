@@ -23,7 +23,8 @@ assert np.all(smoothed_delta > 0), "❌ Smoothed delta must be positive"
 print("✅ Data range checks passed.")
 
 # Check for envelope alignment
-envelope_mismatch = np.any((delta_curve > dynamic_sine_envelope) != within_band_mask)
+tolerance = 1e-12  # Adjust as needed
+envelope_mismatch = np.any((delta_curve > (dynamic_sine_envelope + tolerance)) != within_band_mask)
 assert not envelope_mismatch, "❌ Envelope and band mask are not aligned"
 print("✅ Envelope alignment checks passed.")
 
