@@ -38,47 +38,9 @@ def run_sieve(parameters, delta_curve, dynamic_sine_envelope, within_band_mask, 
             false_negatives.append(zero)
 
     # Check for false positives
+    known_zero_indices = set(np.round(zeta_zeros).astype(int))
     for i, is_within_band in enumerate(within_band_mask):
-        if is_within_band and (i not in np.round(zeta_zeros).astype(int)):
+        if is_within_band and (i not in known_zero_indices):
             false_positives.append(i)
 
     return true_positives, false_negatives, false_positives
-
-
-def verify_alignment(delta_curve, dynamic_sine_envelope):
-    """
-    Verifies that the delta curve and sine envelope are correctly aligned.
-
-    Parameters:
-    - delta_curve (np.ndarray): The precomputed delta curve.
-    - dynamic_sine_envelope (np.ndarray): The dynamic sine envelope.
-
-    Returns:
-    - bool: True if aligned, False otherwise.
-    """
-    return delta_curve.shape == dynamic_sine_envelope.shape
-
-
-def calculate_accuracy(true_positives, false_negatives, false_positives):
-    """
-    Calculates the accuracy metrics for the sieve.
-
-    Parameters:
-    - true_positives (list): Correctly identified zeros.
-    - false_negatives (list): Missed zeros.
-    - false_positives (list): Incorrectly identified zeros.
-
-    Returns:
-    - dict: Accuracy metrics.
-    """
-    total_zeros = len(true_positives) + len(false_negatives)
-    accuracy = len(true_positives) / total_zeros if total_zeros > 0 else 0.0
-    false_positive_rate = len(false_positives) / total_zeros if total_zeros > 0 else 0.0
-
-    return {
-        "accuracy": accuracy,
-        "false_positive_rate": false_positive_rate,
-        "true_positives": len(true_positives),
-        "false_negatives": len(false_negatives),
-        "false_positives": len(false_positives),
-    }
