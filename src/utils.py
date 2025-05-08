@@ -1,30 +1,39 @@
 import os
 
 def load_parameters(filepath):
-    parameters = {}
-    with open(filepath, "r") as file:
-        for line in file:
-            if "=" in line:
-                key, value = line.split("=", 1)
-            elif ":" in line:
-                key, value = line.split(":", 1)
-            else:
-                continue
-            
-            key = key.strip().replace(" ", "_")
-            value = value.strip()
-            
-            # Print each key-value pair as it is loaded
-            print(f"Loading parameter: {key} = {value}")
-            
-            try:
-                parameters[key] = float(value)
-            except ValueError:
-                print(f"Warning: Could not convert parameter '{key}' to float.")
+    """
+    Loads the sieve parameters from a text file.
+    Falls back to default parameters if the file is missing or corrupted.
 
-    print("Final Parameters:", parameters)
+    Parameters:
+    - filepath (str): Path to the parameter file.
+
+    Returns:
+    - dict: Dictionary of parameters.
+    """
+    parameters = {}
+    try:
+        with open(filepath, "r") as file:
+            for line in file:
+                if ":" in line:
+                    key, value = line.split(":", 1)
+                    key = key.strip().replace(" ", "_")
+                    value = value.strip()
+                    parameters[key] = float(value)
+    except FileNotFoundError:
+        print(f"[Warning] Parameter file not found at '{filepath}'. Using default parameters.")
+    except ValueError as e:
+        print(f"[Warning] Error parsing parameter file: {e}. Using default parameters.")
+
+    # Fallback to default if any parameters are missing
+    from config import DEFAULT_PARAMETERS
+    for key, default_value in DEFAULT_PARAMETERS.items():
+        if key not in parameters:
+            print(f"[Warning] Missing parameter '{key}' in file. Using default value: {default_value}")
+            parameters[key] = default_value
+
     return parameters
-    
+
 
 def save_results(output_file, results):
     """
