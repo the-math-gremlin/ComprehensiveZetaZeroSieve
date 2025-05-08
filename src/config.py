@@ -9,3 +9,11 @@ DELTA_CURVE_FILE = os.path.join(DATA_DIR, "delta_curve.npy")
 DYNAMIC_SINE_ENVELOPE_FILE = os.path.join(DATA_DIR, "dynamic_sine_envelope.npy")
 WITHIN_BAND_MASK_FILE = os.path.join(DATA_DIR, "within_band_mask.npy")
 ZETA_ZEROS_FILE = os.path.join(DATA_DIR, "zeta_zeros.npy")
+
+# Default parameters
+DEFAULT_PARAMETERS = {
+    "Amplitude": 12.2,
+    "Frequency": 0.001,
+    "Smoothing Sigma": 5.0,
+    "Tolerance": 0.875,
+}
