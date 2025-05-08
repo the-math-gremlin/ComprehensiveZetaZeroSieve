@@ -5,20 +5,22 @@ def run_sieve(parameters, delta_curve, dynamic_sine_envelope, within_band_mask, 
     Runs the core sieve algorithm to identify known zeta zeros within the allowed band.
 
     Parameters:
+    - parameters (dict): Dictionary of sieve parameters.
     - delta_curve (np.ndarray): The precomputed delta curve.
     - dynamic_sine_envelope (np.ndarray): The dynamic sine envelope.
     - within_band_mask (np.ndarray): The binary mask indicating valid zero regions.
     - zeta_zeros (np.ndarray): The known nontrivial zeta zeros.
-    - amplitude (float): Sine envelope amplitude.
-    - frequency (float): Sine envelope frequency.
-    - sigma (float): Smoothing parameter.
-    - tolerance (float): Allowed deviation for zero detection.
 
     Returns:
     - true_positives (list): Zeros correctly identified within the band.
     - false_negatives (list): Zeros missed by the sieve.
     - false_positives (list): Points incorrectly identified as zeros.
     """
+    amplitude = parameters["Amplitude"]
+    frequency = parameters["Frequency"]
+    sigma = parameters["Smoothing_Sigma"]
+    tolerance = parameters["Tolerance"]
+
     true_positives = []
     false_negatives = []
     false_positives = []
