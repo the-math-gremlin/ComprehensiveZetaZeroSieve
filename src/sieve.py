@@ -15,10 +15,10 @@ def run_sieve(parameters, delta_curve, dynamic_sine_envelope, within_band_mask, 
     Returns:
     - dict: Dictionary with true positives, false negatives, and false positives.
     """
-    amplitude = parameters["Amplitude"]
-    frequency = parameters["Frequency"]
-    sigma = parameters["Smoothing_Sigma"]
-    tolerance = parameters["Tolerance"]
+    amplitude = parameters.get("Amplitude", 12.2)
+    frequency = parameters.get("Frequency", 0.001)
+    sigma = parameters.get("Smoothing_Sigma", 5.0)
+    tolerance = parameters.get("Tolerance", 0.875)
 
     true_positives = []
     false_negatives = []
