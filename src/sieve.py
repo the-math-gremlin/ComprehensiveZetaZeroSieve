@@ -1,6 +1,6 @@
 import numpy as np
 
-def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, amplitude, frequency, sigma, tolerance):
+def run_sieve(parameters, delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros):
     """
     Runs the core sieve algorithm to identify known zeta zeros within the allowed band.
 
@@ -28,16 +28,16 @@ def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, 
         raise ValueError("Delta curve and sine envelope are not aligned.")
 
     # Check each known zero
-for zero in zeta_zeros:
-    index = int(np.round(zero))  # Round to the nearest index
-    if 0 <= index < len(within_band_mask) and within_band_mask[index]:
-        true_positives.append(zero)
-    else:
-        false_negatives.append(zero)
+    for zero in zeta_zeros:
+        index = int(np.round(zero))  # Round to the nearest index
+        if 0 <= index < len(within_band_mask) and within_band_mask[index]:
+            true_positives.append(zero)
+        else:
+            false_negatives.append(zero)
 
-    # Identify false positives
-    for i, in_band in enumerate(within_band_mask):
-        if in_band and (i not in zeta_zeros):
+    # Check for false positives
+    for i, is_within_band in enumerate(within_band_mask):
+        if is_within_band and (i not in np.round(zeta_zeros).astype(int)):
             false_positives.append(i)
 
     return true_positives, false_negatives, false_positives
