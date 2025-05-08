@@ -11,12 +11,12 @@ smoothed_delta_path = os.path.join(DATA_DIR, "smoothed_delta.npy")
 within_band_mask_path = os.path.join(DATA_DIR, "within_band_mask.npy")
 zeta_zeros_path = os.path.join(DATA_DIR, "zeta_zeros.npy")
 
-# Load the data files
-delta_curve = np.load(delta_curve_path)
-envelope = np.load(envelope_path)
-smoothed_delta = np.load(smoothed_delta_path)
-within_band_mask = np.load(within_band_mask_path)
-zeta_zeros = np.load(zeta_zeros_path)
+# Load files from the data directory
+delta_curve = np.load("data/delta_curve.npy")
+dynamic_sine_envelope = np.load("data/dynamic_sine_envelope.npy")
+smoothed_delta = np.load("data/smoothed_delta.npy")
+within_band_mask = np.load("data/within_band_mask.npy")
+zeta_zeros = np.load("data/zeta_zeros.npy")
 
 # Perform basic integrity checks
 print("✅ Basic data integrity checks passed.")
