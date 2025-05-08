@@ -12,21 +12,27 @@ def load_parameters(filepath):
     """
     parameters = {}
     with open(filepath, "r") as file:
-        lines = file.readlines()
-        for line in lines:
-            # Split on the first "=" only, in case there are extra "=" signs
+        for line in file:
+            # Allow both "=" and ":" as separators
             if "=" in line:
                 key, value = line.split("=", 1)
-                key = key.strip()
-                value = value.strip()
-                
-                # Ensure the value is a valid float
-                try:
-                    parameters[key] = float(value)
-                except ValueError:
-                    print(f"Warning: Could not convert parameter '{key}' to float.")
-    return parameters
+            elif ":" in line:
+                key, value = line.split(":", 1)
+            else:
+                continue
+            
+            # Remove leading and trailing whitespace
+            key = key.strip().replace(" ", "_")
+            value = value.strip()
+            
+            # Convert the value to float if possible
+            try:
+                parameters[key] = float(value)
+            except ValueError:
+                print(f"Warning: Could not convert parameter '{key}' to float.")
 
+    return parameters
+    
 
 def save_results(output_file, results):
     """
