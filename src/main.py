@@ -16,7 +16,7 @@ def main():
         params = load_parameters(config.PARAMETERS_FILE)
         amplitude = params["Amplitude"]
         frequency = params["Frequency"]
-        sigma = params["Smoothing Sigma"]
+        sigma = params["Smoothing_Sigma"]
         tolerance = params["Tolerance"]
         if args.verbose:
             print(f"Loaded Sieve Parameters:\nAmplitude = {amplitude}\nFrequency = {frequency}\nSigma = {sigma}\nTolerance = {tolerance}\n")
