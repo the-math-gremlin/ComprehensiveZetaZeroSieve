@@ -1,4 +1,4 @@
 Amplitude: 12.2
 Frequency: 0.001
-Smoothing Sigma: 5.0
+Smoothing_Sigma: 5.0
 Tolerance: 0.875
