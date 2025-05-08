@@ -41,12 +41,13 @@ def run_sieve(parameters, delta_curve, dynamic_sine_envelope, within_band_mask, 
     tolerance_radius = int(np.ceil(tolerance * len(delta_curve) / len(zeta_zeros)))
 
     for i, is_within_band in enumerate(within_band_mask):
-    if is_within_band and not any(abs(i - zero) <= tolerance_radius for zero in known_zero_indices):
-        false_positives.append(i)
-    
-    # Add a progress logger for large files
-    if i % 10000 == 0:
-        log(f"Checked index {i} / {len(within_band_mask)}")
+        if is_within_band and not any(abs(i - zero) <= tolerance_radius for zero in known_zero_indices):
+            false_positives.append(i)
+        
+        # Add a progress logger for large files
+        if i % 10000 == 0:
+            log(f"Checked index {i} / {len(within_band_mask)}")
+
 
     # Log results
     log(f"True Positives: {len(true_positives)}")
