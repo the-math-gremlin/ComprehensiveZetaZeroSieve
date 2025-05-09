@@ -1,7 +1,7 @@
 import numpy as np
 import os
 from utils import load_parameters, load_data_files
-
+from scipy.ndimage import gaussian_filter1d
 
 def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, parameters, limit=None, verbose=False):
     A = parameters["Amplitude"]
@@ -16,10 +16,9 @@ def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, 
     missed_zeros = []
     known_zero_indices = set(zeta_zeros)
 
-
     # Prepare the envelope for comparison
     t_values = np.arange(1, len(delta_curve) + 1)
-    mu_t = np.convolve(delta_curve, np.ones(int(sigma)) / sigma, mode='same')
+    mu_t = gaussian_filter1d(delta_curve, sigma)
     envelope_reconstructed = mu_t + A * np.sin(2 * np.pi * f * np.log(t_values + 1))
 
     # Create or clear the diagnostic log
