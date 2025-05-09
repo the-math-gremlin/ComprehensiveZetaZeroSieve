@@ -2,7 +2,16 @@ import numpy as np
 import sys
 import os
 sys.path.insert(0, os.path.abspath('./src'))
-from utils import load_parameters, load_data_files
+from utils import load_parameters
+
+
+def load_data_files():
+    delta_curve = np.load('./data/delta_curve.npy')
+    dynamic_sine_envelope = np.load('./data/dynamic_sine_envelope.npy')
+    within_band_mask = np.load('./data/within_band_mask.npy')
+    zeta_zeros = np.load('./data/zeta_zeros.npy')
+    return delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros
+
 import sys
 import os
 import sys
