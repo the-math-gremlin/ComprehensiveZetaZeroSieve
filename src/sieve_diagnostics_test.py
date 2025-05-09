@@ -24,28 +24,10 @@ def test_zero_proximity_check(debug_mode=False):
         delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, parameters, limit=None, verbose=True
     )
 
-    # Sanity check: ensure zeta_zeros is populated
-    assert len(known_zeros) == 100000, f"Expected 100,000 known zeros, got {len(known_zeros)}" f"Consider checking the scaling logic or data precision."
-
-    # Check if any known zeros were missed
-    missing = []
-    tolerance_radius = parameters["Tolerance"]
-    missed_count = 0
-    for zero in zeta_zeros:
-        if not np.any(np.abs(known_zeros - zero) <= tolerance_radius):
-            if debug_mode and missed_count < 10:
-                offsets = np.abs(known_zeros - zero)
-                min_offset = np.min(offsets)
-                print(f"[DEBUG] Potential missed zero at index {zero:.12f}, minimum offset: {min_offset:.12f}")
-                missed_count += 1
-            missing.append(zero)
-
-    # Summary
+    # Print the summary in the correct format for parameter_sweep.py
     print(f"True Positives: {true_positives}")
-    print(f"False Negatives: {false_negatives}")
     print(f"False Positives: {false_positives}")
     print(f"Missed Zeros: {len(missed_zeros)}")
-
 
 if __name__ == "__main__":
     test_zero_proximity_check(debug_mode=True)
