@@ -1,68 +1,45 @@
 import numpy as np
-import os
 
-def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, parameters, limit=None):
-    """Run the harmonic sieve to identify true zeta zeros with detailed diagnostics."""
-    A = parameters["Amplitude"]
-    f = parameters["Base_Frequency"]
+def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, parameters, limit=None, verbose=False):
+    amplitude = parameters["Amplitude"]
+    frequency = parameters["Frequency"]
     sigma = parameters["Smoothing_Sigma"]
-    tolerance_radius = int(np.ceil(parameters["Tolerance"] * 10))
-    phase_shift = parameters["Phase_Shift"]
-    seed_region_end = parameters["Seed_Region_End"]
+    tolerance = parameters["Tolerance"]
 
     true_positives = 0
     false_negatives = 0
     false_positives = 0
 
-    # Convert known zeros to indices
-    known_zero_indices = set(np.round(zeta_zeros).astype(int))
+    # Set up logging if verbose mode is enabled
+    if verbose:
+        with open("sieve_diagnostics.log", "w") as log_file:
+            log_file.write("Index, Within Band, Known Zero Match\n")
 
-    # Prepare the envelope for comparison
-    t_values = np.arange(1, len(delta_curve) + 1)
-    mu_t = np.convolve(delta_curve, np.ones(int(sigma)) / sigma, mode='same')
-    envelope_reconstructed = mu_t + A * np.sin(2 * np.pi * f * np.log(t_values + 1) + phase_shift)
+    for i in range(len(delta_curve)):
+        # Apply limit if specified
+        if limit is not None and i >= limit:
+            break
 
-    # Create or clear the diagnostic log
-    diagnostic_file = "sieve_diagnostics.log"
-    if os.path.exists(diagnostic_file):
-        os.remove(diagnostic_file)
+        is_within_band = within_band_mask[i]
+        known_zero_match = any(abs(i - zero) <= tolerance for zero in zeta_zeros)
 
-    with open(diagnostic_file, "w") as log_file:
-        log_file.write("[DIAGNOSTIC LOG] Sieve Run Analysis\n")
-        log_file.write("=" * 40 + "\n\n")
-
-        for i in range(len(delta_curve) if limit is None else min(len(delta_curve), limit)):
-            # Skip the seed region
-            if i <= seed_region_end:
-                continue
-
-            # Check if this point is within the envelope band
-            is_within_band = within_band_mask[i]
-
-            # Check for known zero proximity
-            is_near_known_zero = any(abs(i - zero) <= tolerance_radius for zero in known_zero_indices)
-
-            # Classify as a true positive, false positive, or false negative
-            if is_within_band:
-                if is_near_known_zero:
-                    true_positives += 1
-                else:
-                    false_positives += 1
-                    log_file.write(f"[False Positive] Index: {i}, Delta: {delta_curve[i]}, Envelope: {envelope_reconstructed[i]}\n")
-            elif is_near_known_zero:
+        # Classify the index
+        if is_within_band:
+            if known_zero_match:
+                true_positives += 1
+            else:
+                false_positives += 1
+        else:
+            if known_zero_match:
                 false_negatives += 1
-                log_file.write(f"[Missed Zero] Index: {i}, Delta: {delta_curve[i]}, Envelope: {envelope_reconstructed[i]}\n")
 
-        # Final results
-        log_file.write("\n[INFO] Sieve run completed.\n")
-        log_file.write(f"[INFO] True Positives: {true_positives}\n")
-        log_file.write(f"[INFO] False Negatives: {false_negatives}\n")
-        log_file.write(f"[INFO] False Positives: {false_positives}\n")
+        # Log detailed diagnostics if enabled
+        if verbose:
+            with open("sieve_diagnostics.log", "a") as log_file:
+                log_file.write(f"{i}, {is_within_band}, {known_zero_match}\n")
 
-    # Console output for summary
-    print("\n[INFO] Sieve run completed.")
-    print(f"[INFO] True Positives: {true_positives}")
-    print(f"[INFO] False Negatives: {false_negatives}")
-    print(f"[INFO] False Positives: {false_positives}")
+        # Optional progress indicator
+        if verbose and i % 1000 == 0:
+            print(f"[LOG] Checked index {i} / {limit if limit else len(delta_curve)}")
 
     return true_positives, false_negatives, false_positives
