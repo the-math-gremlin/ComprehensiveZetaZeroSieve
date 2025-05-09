@@ -7,7 +7,7 @@ def run_sieve(delta_curve, envelope, within_band_mask, known_zeros, params, limi
     A = params["Amplitude"]
     f = params["Frequency"]
     sigma = params["Smoothing_Sigma"]
-    tolerance_radius = int(np.ceil(params["Tolerance"] * 10))
+    tolerance_radius = int(np.ceil(params["Tolerance"] * len(delta_curve) / len(known_zeros)))
 
     # Smooth the delta curve to get the centerline (mu(t))
     mu_t = gaussian_filter1d(delta_curve, sigma)
