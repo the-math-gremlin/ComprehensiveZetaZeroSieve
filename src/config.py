@@ -16,4 +16,7 @@ DEFAULT_PARAMETERS = {
     "Frequency": 0.001,
     "Smoothing_Sigma": 5.0,
     "Tolerance": 0.875,
+    "Phase_Shift": 0.0,
+    "Seed_Region_End": 50,
+    "Base_Frequency": abs(1 / np.log(3) - 1 / np.log(np.pi))
 }
