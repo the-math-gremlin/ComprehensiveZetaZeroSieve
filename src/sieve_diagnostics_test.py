@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath('./src'))
 from main import run_sieve
 
 
-def test_zero_proximity_check():
+def test_zero_proximity_check(debug_mode=False):
     # Load parameters and data
     parameters = load_parameters()
     delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros = load_data_files()
@@ -38,6 +38,8 @@ def test_zero_proximity_check():
     missing = []
     for zero in known_zero_indices:
         if zero not in known_zero_indices:
+            if debug_mode:
+                print(f"[DEBUG] Potential missed zero at index {zero}")
             missing.append(zero)
     print(f"Known Zeros Not Detected: {len(missing)}")
     print(f"Missed Zero Indices: {missing}")
@@ -50,4 +52,4 @@ def test_zero_proximity_check():
 
 
 if __name__ == "__main__":
-    test_zero_proximity_check()
+    test_zero_proximity_check(debug_mode=True)
