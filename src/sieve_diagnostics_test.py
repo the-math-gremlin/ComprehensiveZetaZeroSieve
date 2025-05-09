@@ -35,7 +35,8 @@ def test_zero_proximity_check(debug_mode=False):
     else:
         print("[WARNING] Parameter file '../data/sieve_parameters.txt' not found. Using default parameters.")
     delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros = load_data_files()
-    tolerance_radius = int(np.ceil(parameters["Tolerance"] * 10))
+    tolerance_radius = int(np.ceil(parameters["Tolerance"] * 1000000))
+    print(f"[INFO] Using tolerance radius of {tolerance_radius} (scaled to match zero precision)")
     known_zero_indices = set(np.round(zeta_zeros * 1000000).astype(int))
     print(f"[INFO] Loaded {len(known_zero_indices)} known zero indices (after high-precision scaling)")
     print(f"[INFO] Loaded {len(known_zero_indices)} known zero indices (after scaling and rounding)")
@@ -56,6 +57,8 @@ def test_zero_proximity_check(debug_mode=False):
             if debug_mode:
                 print(f"[DEBUG] Zero {zero} not in known_zero_indices after high-precision scaling")
             if debug_mode:
+                print(f"[DEBUG] Zero {zero} not in known_zero_indices after high-precision scaling")
+            if debug_mode:
                 print(f"[DEBUG] Zero {zero} not in known_zero_indices after scaling and rounding")
             if debug_mode:
                 print(f"[DEBUG] Zero {zero} not in known_zero_indices after rounding")
@@ -63,6 +66,12 @@ def test_zero_proximity_check(debug_mode=False):
                 print(f"[DEBUG] Potential missed zero at index {zero}")
             missing.append(zero)
     print(f"Known Zeros Not Detected: {len(missing)}")
+    if debug_mode and missing:
+        print(f"[DEBUG] First 10 missing zeros: {sorted(missing)[:10]}")
+        print(f"[DEBUG] Total known zeros: {len(known_zero_indices)}")
+        print(f"[DEBUG] Total true positives: {len(set(true_positives))}")
+        print(f"[DEBUG] Total false negatives: {len(missing)}")
+        print(f"[DEBUG] Total false positives: {len(false_positives)}")
     if debug_mode and missing:
         print(f"[DEBUG] First 10 missing zeros: {sorted(missing)[:10]}")
     if debug_mode:
