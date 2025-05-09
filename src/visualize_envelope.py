@@ -1,43 +1,38 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.ndimage import gaussian_filter1d
-from config import DELTA_CURVE_FILE, DYNAMIC_SINE_ENVELOPE_FILE, ZETA_ZEROS_FILE, PARAMETERS_FILE
-from utils import load_parameters
+import os
 
-def visualize_envelope():
-    # Load data
-    delta_curve = np.load(DELTA_CURVE_FILE)
-    known_zeros = np.load(ZETA_ZEROS_FILE)
-    params = load_parameters(PARAMETERS_FILE)
+# Load the required data files
+data_dir = os.path.abspath('../data')
+delta_curve = np.load(os.path.join(data_dir, 'delta_curve.npy'))
+dynamic_sine_envelope = np.load(os.path.join(data_dir, 'dynamic_sine_envelope.npy'))
+within_band_mask = np.load(os.path.join(data_dir, 'within_band_mask.npy'))
+zeta_zeros = np.load(os.path.join(data_dir, 'zeta_zeros.npy'))
 
-    # Extract parameters
-    A = params["Amplitude"]
-    f = params["Frequency"]
-    sigma = params["Smoothing_Sigma"]
+# Plot the delta curve, sine envelope, and known zeros
+plt.figure(figsize=(15, 8))
+plt.plot(delta_curve, label='Delta Curve (Raw)', color='blue', linewidth=1)
+plt.plot(dynamic_sine_envelope, label='Reconstructed Envelope', color='red', linewidth=1)
 
-    # Calculate the smoothed centerline (mu_t)
-    mu_t = gaussian_filter1d(delta_curve, sigma)
+# Overlay the within-band mask
+within_band_indices = np.where(within_band_mask == 1)[0]
+plt.scatter(within_band_indices, dynamic_sine_envelope[within_band_indices], color='green', s=1, label='Within-Band Mask')
 
-    # Reconstruct the dynamic sine envelope
-    t_values = np.arange(1, len(delta_curve) + 1)
-    envelope_reconstructed = mu_t + A * np.sin(2 * np.pi * f * np.log(t_values + 1))
+# Overlay known zeros
+plt.scatter(zeta_zeros, dynamic_sine_envelope[(zeta_zeros - 1).astype(int)], color='orange', s=8, label='Known Zeros')
 
-    # Plot the delta curve
-    plt.figure(figsize=(14, 8))
-    plt.plot(t_values, delta_curve, color='blue', label='Delta Curve (Raw)')
-    plt.plot(t_values, mu_t, color='green', linestyle='--', linewidth=2, label='Smoothed Centerline (mu_t)')
-    plt.plot(t_values, envelope_reconstructed, color='red', linewidth=1.5, label='Reconstructed Envelope')
+# Highlight missed zeros if any
+missed_zeros_file = os.path.join(data_dir, 'missed_zeros.npy')
+if os.path.exists(missed_zeros_file):
+    missed_zeros = np.load(missed_zeros_file)
+    plt.scatter(missed_zeros, dynamic_sine_envelope[(missed_zeros - 1).astype(int)], color='purple', s=20, label='Missed Zeros')
+    print(f"[INFO] Highlighting {len(missed_zeros)} missed zeros: {missed_zeros[:10]}")
+else:
+    print("[INFO] No missed zeros file found. Skipping missed zero overlay.")
 
-    # Highlight known zeros
-    zero_indices = [int(round(z)) for z in known_zeros if z < len(delta_curve)]
-    plt.scatter(zero_indices, envelope_reconstructed[zero_indices], color='orange', marker='x', s=50, label='Known Zeros')
-
-    # Add labels and legend
-    plt.title("Reconstructed Envelope vs Delta Curve")
-    plt.xlabel("Index (t)")
-    plt.ylabel("Amplitude")
-    plt.legend()
-    plt.show()
-
-if __name__ == "__main__":
-    visualize_envelope()
+# Add labels and legend
+plt.title('Reconstructed Envelope vs Delta Curve')
+plt.xlabel('Index (t)')
+plt.ylabel('Amplitude')
+plt.legend()
+plt.show()
