@@ -1,20 +1,27 @@
 import numpy as np
-import os
-from config import PARAMETERS_FILE, DELTA_CURVE_FILE, DYNAMIC_SINE_ENVELOPE_FILE, WITHIN_BAND_MASK_FILE, ZETA_ZEROS_FILE, DEFAULT_PARAMETERS
+from config import PARAMETERS_FILE, DEFAULT_PARAMETERS
 
-def load_parameters(file_path=PARAMETERS_FILE):
+def load_parameters():
+    """Load sieve parameters from the configuration file."""
     parameters = DEFAULT_PARAMETERS.copy()
-    if os.path.exists(file_path):
-        with open(file_path, "r") as f:
+
+    try:
+        with open(PARAMETERS_FILE, "r") as f:
             for line in f:
                 if ":" in line:
                     key, value = line.strip().split(":")
-                    parameters[key.strip()] = float(value.strip())
+                    key, value = key.strip(), value.strip()
+                    if key in parameters:
+                        parameters[key] = float(value)
+    except FileNotFoundError:
+        print(f"[Warning] Parameter file '{PARAMETERS_FILE}' not found. Using default parameters.")
+
     return parameters
 
 def load_data_files():
-    delta_curve = np.load(DELTA_CURVE_FILE)
-    dynamic_sine_envelope = np.load(DYNAMIC_SINE_ENVELOPE_FILE)
-    within_band_mask = np.load(WITHIN_BAND_MASK_FILE)
-    zeta_zeros = np.load(ZETA_ZEROS_FILE)
+    """Load the main data files for the sieve."""
+    delta_curve = np.load("../data/delta_curve.npy")
+    dynamic_sine_envelope = np.load("../data/dynamic_sine_envelope.npy")
+    within_band_mask = np.load("../data/within_band_mask.npy")
+    zeta_zeros = np.load("../data/zeta_zeros.npy")
     return delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros
