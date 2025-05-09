@@ -1,6 +1,8 @@
 import numpy as np
 from utils import load_parameters, load_data_files
-from ComprehensiveZetaZeroSieve import run_sieve
+import sys
+sys.path.append('../src')
+from main import run_sieve
 
 
 def test_zero_proximity_check():
@@ -12,7 +14,7 @@ def test_zero_proximity_check():
 
     # Run the sieve in diagnostic mode
     true_positives, false_negatives, false_positives, missed_zeros = run_sieve(
-        delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, parameters, limit=100000, verbose=True
+        delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, parameters, limit=None, verbose=True
     )
 
     # Sanity check: ensure known_zero_indices is populated
