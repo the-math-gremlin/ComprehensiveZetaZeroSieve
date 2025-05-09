@@ -1,8 +1,11 @@
+import numpy as np
+from utils import log
+
 def run_sieve(delta_curve, envelope, within_band_mask, known_zeros, params, limit=100000):
     amplitude = params["Amplitude"]
     frequency = params["Frequency"]
     sigma = params["Smoothing_Sigma"]
-    tolerance_radius = params["Tolerance"]
+    tolerance_radius = int(np.ceil(params["Tolerance"] * len(delta_curve) / len(known_zeros)))
 
     # Convert known zeros to indices for faster lookup
     known_zero_indices = set(int(zero) for zero in known_zeros)
@@ -21,7 +24,7 @@ def run_sieve(delta_curve, envelope, within_band_mask, known_zeros, params, limi
 
         # Optional verbose logging for progress
         if i > 0 and i % 10000 == 0:
-            print(f"[LOG] Checked index {i} / {limit}")
+            log(f"Checked index {i} / {limit}")
 
     false_negatives = len(known_zero_indices - set(range(limit)))
 
