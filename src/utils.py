@@ -1,4 +1,5 @@
 import os
+import numpy as np
 from config import PARAMETERS_FILE, DEFAULT_PARAMETERS
 
 def load_parameters(filepath=PARAMETERS_FILE):
@@ -18,8 +19,7 @@ def load_parameters(filepath=PARAMETERS_FILE):
             for line in file:
                 if ":" in line:
                     key, value = line.strip().split(":", 1)
-                    key = key.strip().replace(" ", "_")
-                    parameters[key] = float(value.strip())
+                    parameters[key.strip()] = float(value.strip())
     except FileNotFoundError:
         print(f"[Warning] Parameter file not found at '{filepath}'. Using default parameters.")
     except Exception as e:
@@ -30,10 +30,6 @@ def load_parameters(filepath=PARAMETERS_FILE):
         if key not in parameters:
             print(f"[Warning] Missing parameter '{key}' in file. Using default value: {default_value}")
             parameters[key] = default_value
-
-    # Ensure all parameters are floats
-    parameters = {key: float(value) for key, value in parameters.items()}
-
 
     # Print the final loaded parameters for verification
     print(f"Final Parameters: {parameters}")
