@@ -7,7 +7,7 @@ def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, 
     A = parameters["Amplitude"]
     f = parameters["Base_Frequency"]
     sigma = parameters["Smoothing_Sigma"]
-    tolerance_radius = int(np.ceil(parameters["Tolerance"] * 10))
+    tolerance_radius = parameters["Tolerance"]
     seed_region_end = parameters["Seed_Region_End"]
 
     true_positives = 0
