@@ -2,17 +2,8 @@ import numpy as np
 import sys
 import os
 sys.path.insert(0, os.path.abspath('./src'))
-from utils import load_parameters
+from utils import load_parameters, load_data_files
 from main import run_sieve
-
-def load_data_files():
-    data_dir = os.path.abspath('../data')
-    delta_curve = np.load(os.path.join(data_dir, 'delta_curve.npy'))
-    dynamic_sine_envelope = np.load(os.path.join(data_dir, 'dynamic_sine_envelope.npy'))
-    within_band_mask = np.load(os.path.join(data_dir, 'within_band_mask.npy'))
-    zeta_zeros = np.load(os.path.join(data_dir, 'zeta_zeros.npy'))
-    return delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros
-
 
 def test_zero_proximity_check(debug_mode=False):
     # Load parameters and data
