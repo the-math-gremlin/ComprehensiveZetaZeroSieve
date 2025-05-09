@@ -5,20 +5,24 @@ from utils import log
 def run_sieve(delta_curve, envelope, within_band_mask, known_zeros, params, limit=100000):
     # Extract parameters
     A = params["Amplitude"]
-    f = params["Frequency"]
+    f = params["Base_Frequency"]
     sigma = params["Smoothing_Sigma"]
-    tolerance_radius = int(np.ceil(params["Tolerance"] * len(delta_curve) / len(known_zeros)))
+    tolerance_radius = int(np.ceil(params["Tolerance"] * 10))
+    seed_region_end = params["Seed_Region_End"]
+    phi = params["Phase_Shift"]
 
-    # Smooth the delta curve to get the centerline (mu(t))
+    # Smooth the delta curve to get the centerline (mu_t)
     mu_t = gaussian_filter1d(delta_curve, sigma)
 
     # Calculate the expected envelope
-    phi = 0 
-    envelope_reconstructed = mu_t + A * np.sin(2 * np.pi * f * np.log(np.arange(1, len(delta_curve) + 1) + 1) + phi)
-
+    t_values = np.arange(1, len(delta_curve) + 1)
+    envelope_reconstructed = mu_t + A * np.sin(2 * np.pi * f * np.log(t_values + 1) + phi)
 
     # Convert known zeros to indices
-    known_zero_indices = set(int(zero) for zero in known_zeros)
+    known_zero_indices = set(int(round(zero)) for zero in known_zeros)
+
+    # Exclude the seed region
+    known_zero_indices = {z for z in known_zero_indices if z > seed_region_end}
 
     true_positives = 0
     false_negatives = 0
