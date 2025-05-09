@@ -1,4 +1,4 @@
-Amplitude: 12.2
+Amplitude: 11.8
 Base_Frequency: 0.001
 Smoothing_Sigma: 5.0
-Tolerance: 0.875
+Tolerance: 0.9
