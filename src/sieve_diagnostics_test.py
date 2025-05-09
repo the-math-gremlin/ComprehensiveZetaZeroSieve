@@ -40,32 +40,32 @@ def test_zero_proximity_check(debug_mode=False):
     print(f"[INFO] Using tolerance radius of {tolerance_radius} (scaled to match zero precision)")
     known_zeros = np.array(zeta_zeros, dtype=np.float64)
     print(f"[INFO] Loaded {len(known_zeros)} known zeros for direct precision matching")
-    print(f"[INFO] Loaded {len(known_zero_indices)} known zero indices (after high-precision scaling)")
-    print(f"[INFO] Loaded {len(known_zero_indices)} known zero indices (after scaling and rounding)")
-    print(f"[INFO] Loaded {len(known_zero_indices)} known zero indices (after rounding)")
+    print(f"[INFO] Loaded {len(zeta_zeros)} known zero indices (after high-precision scaling)")
+    print(f"[INFO] Loaded {len(zeta_zeros)} known zero indices (after scaling and rounding)")
+    print(f"[INFO] Loaded {len(zeta_zeros)} known zero indices (after rounding)")
 
     # Run the sieve in diagnostic mode
     true_positives, false_negatives, false_positives, missed_zeros = run_sieve(
         delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, parameters, limit=None, verbose=True
     )
 
-    # Sanity check: ensure known_zero_indices is populated
-    assert len(known_zeros) == 100000, f"Expected 100,000 known zeros, got {len(known_zeros)}" f"Expected 100,000 known zeros, got {len(known_zero_indices)}. Consider checking the scaling logic or data precision." f"Expected 100,000 known zeros, got {len(known_zero_indices)}"
+    # Sanity check: ensure zeta_zeros is populated
+    assert len(known_zeros) == 100000, f"Expected 100,000 known zeros, got {len(known_zeros)}" f"Expected 100,000 known zeros, got {len(zeta_zeros)}. Consider checking the scaling logic or data precision." f"Expected 100,000 known zeros, got {len(zeta_zeros)}"
 
     # Check if any known zeros were missed
     missing = []
-    for zero in known_zero_indices:
+    for zero in zeta_zeros:
         if not np.any(np.abs(known_zeros - zero) <= tolerance_radius):
             if debug_mode:
                 print(f"[DEBUG] Zero {zero} not within tolerance band of known zeros")
             if debug_mode:
-                print(f"[DEBUG] Zero {zero} not in known_zero_indices after high-precision scaling")
+                print(f"[DEBUG] Zero {zero} not in zeta_zeros after high-precision scaling")
             if debug_mode:
-                print(f"[DEBUG] Zero {zero} not in known_zero_indices after high-precision scaling")
+                print(f"[DEBUG] Zero {zero} not in zeta_zeros after high-precision scaling")
             if debug_mode:
-                print(f"[DEBUG] Zero {zero} not in known_zero_indices after scaling and rounding")
+                print(f"[DEBUG] Zero {zero} not in zeta_zeros after scaling and rounding")
             if debug_mode:
-                print(f"[DEBUG] Zero {zero} not in known_zero_indices after rounding")
+                print(f"[DEBUG] Zero {zero} not in zeta_zeros after rounding")
             if debug_mode:
                 print(f"[DEBUG] Potential missed zero at index {zero}")
             missing.append(zero)
@@ -78,7 +78,7 @@ def test_zero_proximity_check(debug_mode=False):
         print(f"[DEBUG] Total false positives: {len(false_positives)}")
     if debug_mode and missing:
         print(f"[DEBUG] First 10 missing zeros: {sorted(missing)[:10]}")
-        print(f"[DEBUG] Total known zeros: {len(known_zero_indices)}")
+        print(f"[DEBUG] Total known zeros: {len(zeta_zeros)}")
         print(f"[DEBUG] Total true positives: {len(set(true_positives))}")
         print(f"[DEBUG] Total false negatives: {len(missing)}")
         print(f"[DEBUG] Total false positives: {len(false_positives)}")
