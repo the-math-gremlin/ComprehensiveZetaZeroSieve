@@ -1,4 +1,5 @@
 import os
+import numpy as np
 
 # Base directory for data files
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../data"))
@@ -18,5 +19,5 @@ DEFAULT_PARAMETERS = {
     "Tolerance": 0.875,
     "Phase_Shift": 0.0,
     "Seed_Region_End": 50,
-    "Base_Frequency": abs(1 / np.log(3) - 1 / np.log(np.pi))
+    "Base_Frequency": abs(1 / np.log(3) - 1 / np.log(np.pi))  # Corrected line
 }
