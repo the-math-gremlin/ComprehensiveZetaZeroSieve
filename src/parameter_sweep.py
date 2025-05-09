@@ -35,9 +35,9 @@ for tolerance, amplitude, frequency in product(tolerance_range, amplitude_range,
     
     # Parse the output for true positives, false positives, and missed zeros
     output_lines = result.stdout.split("\n")
-    true_positives = next((line.split(":")[1].strip() for line in output_lines if "True Positives" in line), "N/A")
-    false_positives = next((line.split(":")[1].strip() for line in output_lines if "False Positives" in line), "N/A")
-    missed_zeros = next((line.split(":")[1].strip() for line in output_lines if "Missed Zeros" in line), "N/A")
+    true_positives = next((line.split(":")[1].strip() for line in output_lines if "True Positives:" in line), "N/A")
+    false_positives = next((line.split(":")[1].strip() for line in output_lines if "False Positives:" in line), "N/A")
+    missed_zeros = next((line.split(":")[1].strip() for line in output_lines if "Missed Zeros:" in line), "N/A")
     
     # Save the results
     with open(log_file, "a") as f:
@@ -54,29 +54,33 @@ with open(log_file, "r") as f:
     next(f)  # Skip header
     for line in f:
         tol, amp, freq, tp, fp, mz = line.strip().split(",")
-        tp, fp, mz = int(tp), int(fp), int(mz)
+        if tp != "N/A" and fp != "N/A" and mz != "N/A":
+            tp, fp, mz = int(tp), int(fp), int(mz)
+            # Score is true positives minus false positives (penalize missed zeros heavily)
+            score = tp - (fp * 2) - (mz * 10)
 
-        # Score is true positives minus false positives (penalize missed zeros heavily)
-        score = tp - (fp * 2) - (mz * 10)
-
-        if score > best_score:
-            best_score = score
-            best_set = (tol, amp, freq, tp, fp, mz)
-            best_line = line.strip()
+            if score > best_score:
+                best_score = score
+                best_set = (tol, amp, freq, tp, fp, mz)
+                best_line = line.strip()
 
 # Print the best parameter set
-print("\n[INFO] Best Parameter Set:")
-print(f"Tolerance: {best_set[0]}")
-print(f"Amplitude: {best_set[1]}")
-print(f"Frequency: {best_set[2]}")
-print(f"True Positives: {best_set[3]}")
-print(f"False Positives: {best_set[4]}")
-print(f"Missed Zeros: {best_set[5]}")
+if best_set is not None:
+    print("\n[INFO] Best Parameter Set:")
+    print(f"Tolerance: {best_set[0]}")
+    print(f"Amplitude: {best_set[1]}")
+    print(f"Frequency: {best_set[2]}")
+    print(f"True Positives: {best_set[3]}")
+    print(f"False Positives: {best_set[4]}")
+    print(f"Missed Zeros: {best_set[5]}")
 
-# Save the best set for easy reference
-best_file = os.path.join(results_dir, "best_parameters.txt")
-with open(best_file, "w") as f:
-    f.write(best_line + "\n")
+    # Save the best set for easy reference
+    best_file = os.path.join(results_dir, "best_parameters.txt")
+    with open(best_file, "w") as f:
+        f.write(best_line + "\n")
 
-print(f"[INFO] Best parameters saved to {best_file}")
+    print(f"[INFO] Best parameters saved to {best_file}")
+else:
+    print("[WARNING] No valid parameter sets found.")
+
 print("[INFO] Parameter sweep complete. Results saved to", log_file)
