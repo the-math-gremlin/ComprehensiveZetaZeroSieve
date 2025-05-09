@@ -1,7 +1,9 @@
 import numpy as np
 from src.utils import load_parameters, load_data_files
 import sys
-sys.path.append('./src')
+import os
+import sys
+sys.path.insert(0, os.path.abspath('./src'))
 from main import run_sieve
 
 
