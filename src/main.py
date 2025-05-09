@@ -1,30 +1,31 @@
-import argparse
-from config import DEFAULT_PARAMETERS
+import numpy as np
 from utils import load_parameters, load_data_files
 from sieve import run_sieve
 
-def main():
-    parser = argparse.ArgumentParser(description="Comprehensive Zeta Zero Sieve")
-    parser.add_argument("--limit", type=int, default=None, help="Limit the number of indices to process")
-    parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
-    args = parser.parse_args()
-
+def main(limit=None):
     # Load parameters and data files
     parameters = load_parameters()
     delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros = load_data_files()
 
-    # Print the loaded parameters for verification
-    print("\nFinal Parameters:", parameters)
+    # Print parameters for verification
+    print(f"Final Parameters: {parameters}")
 
-    # Run the sieve with the specified limit
+    # Run the sieve
     true_positives, false_negatives, false_positives = run_sieve(
-        delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, parameters, limit=args.limit, verbose=args.verbose
+        delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, parameters, limit
     )
 
-    # Print summary
-    print(f"True Positives: {true_positives}")
-    print(f"False Negatives: {false_negatives}")
-    print(f"False Positives: {false_positives}")
+    # Print results
+    print(f"[INFO] True Positives: {true_positives}")
+    print(f"[INFO] False Negatives: {false_negatives}")
+    print(f"[INFO] False Positives: {false_positives}")
 
 if __name__ == "__main__":
-    main()
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Run the harmonic sieve for zeta zeros.")
+    parser.add_argument("--limit", type=int, default=None, help="Limit the number of indices to check")
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
+    args = parser.parse_args()
+
+    main(limit=args.limit)
