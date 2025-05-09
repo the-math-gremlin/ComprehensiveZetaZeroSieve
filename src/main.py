@@ -1,8 +1,9 @@
 import argparse
 import logging
-from config import load_parameters
+import numpy as np
+from config import PARAMETERS_FILE, DELTA_CURVE_FILE, DYNAMIC_SINE_ENVELOPE_FILE, WITHIN_BAND_MASK_FILE, ZETA_ZEROS_FILE
+from utils import load_parameters, save_results, log
 from sieve import run_sieve
-from utils import load_data_files
 
 def main():
     # Set up argument parsing
@@ -16,14 +17,14 @@ def main():
     logging.basicConfig(level=logging.INFO if args.verbose else logging.WARNING, format="[%(levelname)s] %(message)s")
 
     # Load parameters
-    params = load_parameters()
+    params = load_parameters(PARAMETERS_FILE)
     logging.info(f"Final Parameters: {params}")
 
     # Load data files
-    delta_curve, envelope, within_band_mask, known_zeros = load_data_files()
-    logging.info(f"Delta Curve Length: {len(delta_curve)}")
-    logging.info(f"Within Band Mask Length: {len(within_band_mask)}")
-    logging.info(f"Number of Known Zeros: {len(known_zeros)}")
+    delta_curve = np.load(DELTA_CURVE_FILE)
+    envelope = np.load(DYNAMIC_SINE_ENVELOPE_FILE)
+    within_band_mask = np.load(WITHIN_BAND_MASK_FILE)
+    known_zeros = np.load(ZETA_ZEROS_FILE)
 
     # Run the sieve with the specified index limit
     true_positives, false_negatives, false_positives = run_sieve(delta_curve, envelope, within_band_mask, known_zeros, params, limit=args.limit)
