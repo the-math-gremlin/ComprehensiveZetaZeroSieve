@@ -1,5 +1,5 @@
 import numpy as np
-from utils import load_parameters, load_data_files
+from src.utils import load_parameters, load_data_files
 import sys
 sys.path.append('./src')
 from main import run_sieve
