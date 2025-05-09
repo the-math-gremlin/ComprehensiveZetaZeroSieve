@@ -1,5 +1,8 @@
 import numpy as np
-from src.utils import load_parameters, load_data_files
+import sys
+import os
+sys.path.insert(0, os.path.abspath('./src'))
+from utils import load_parameters, load_data_files
 import sys
 import os
 import sys
