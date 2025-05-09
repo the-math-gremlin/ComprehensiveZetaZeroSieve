@@ -1,60 +1,27 @@
-import os
 import numpy as np
 from config import PARAMETERS_FILE, DEFAULT_PARAMETERS
 
-def load_parameters(filepath=PARAMETERS_FILE):
-    """
-    Loads the sieve parameters from a text file.
-    Falls back to default parameters if the file is missing or corrupted.
+def load_parameters():
+    """Load sieve parameters from the configuration file."""
+    parameters = DEFAULT_PARAMETERS.copy()
 
-    Parameters:
-    - filepath (str): Path to the parameter file.
-
-    Returns:
-    - dict: Dictionary of parameters.
-    """
-    parameters = {}
     try:
-        with open(filepath, "r") as file:
-            for line in file:
+        with open(PARAMETERS_FILE, "r") as f:
+            for line in f:
                 if ":" in line:
-                    key, value = line.strip().split(":", 1)
-                    parameters[key.strip()] = float(value.strip())
+                    key, value = line.strip().split(":")
+                    key, value = key.strip(), value.strip()
+                    if key in parameters:
+                        parameters[key] = float(value)
     except FileNotFoundError:
-        print(f"[Warning] Parameter file not found at '{filepath}'. Using default parameters.")
-    except Exception as e:
-        print(f"[Warning] Error loading parameter file: {e}. Using default parameters.")
-
-    # Fallback to default if any parameters are missing
-    for key, default_value in DEFAULT_PARAMETERS.items():
-        if key not in parameters:
-            print(f"[Warning] Missing parameter '{key}' in file. Using default value: {default_value}")
-            parameters[key] = default_value
-
-    # Print the final loaded parameters for verification
-    print(f"Final Parameters: {parameters}")
+        print(f"[Warning] Parameter file '{PARAMETERS_FILE}' not found. Using default parameters.")
 
     return parameters
 
-
-def save_results(output_file, results):
-    """
-    Saves the sieve results to a text file.
-
-    Parameters:
-    - output_file (str): Path to the output file.
-    - results (dict): Dictionary of results.
-    """
-    with open(output_file, "w") as file:
-        for key, value in results.items():
-            file.write(f"{key}: {value}\n")
-
-
-def log(message):
-    """
-    Simple logging function.
-
-    Parameters:
-    - message (str): The message to log.
-    """
-    print(f"[LOG] {message}")
+def load_data_files():
+    """Load the main data files for the sieve."""
+    delta_curve = np.load("../data/delta_curve.npy")
+    dynamic_sine_envelope = np.load("../data/dynamic_sine_envelope.npy")
+    within_band_mask = np.load("../data/within_band_mask.npy")
+    zeta_zeros = np.load("../data/zeta_zeros.npy")
+    return delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros
