@@ -16,23 +16,10 @@ def load_parameters(filepath=PARAMETERS_FILE):
     try:
         with open(filepath, "r") as file:
             for line in file:
-                # Allow both ":" and "=" as separators
                 if ":" in line:
-                    key, value = line.split(":", 1)
-                elif "=" in line:
-                    key, value = line.split("=", 1)
-                else:
-                    continue
-                
-                key = key.strip().replace(" ", "_")
-                value = value.strip()
-                
-                # Convert the value to float if possible
-                try:
-                    parameters[key] = float(value)
-                except ValueError:
-                    print(f"[Warning] Could not convert parameter '{key}' to float.")
-
+                    key, value = line.strip().split(":", 1)
+                    key = key.strip().replace(" ", "_")
+                    parameters[key] = float(value.strip())
     except FileNotFoundError:
         print(f"[Warning] Parameter file not found at '{filepath}'. Using default parameters.")
     except Exception as e:
