@@ -18,7 +18,7 @@ def run_sieve(delta_curve, envelope, within_band_mask, known_zeros, params, limi
 
 
     # Convert known zeros to indices
-    known_zero_indices = set(int(round(zero)) for zero in known_zeros)
+    known_zero_indices = set(int(zero) for zero in known_zeros)
 
     true_positives = 0
     false_negatives = 0
