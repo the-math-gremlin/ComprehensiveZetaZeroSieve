@@ -31,6 +31,10 @@ def load_parameters(filepath=PARAMETERS_FILE):
             print(f"[Warning] Missing parameter '{key}' in file. Using default value: {default_value}")
             parameters[key] = default_value
 
+    # Ensure all parameters are floats
+    parameters = {key: float(value) for key, value in parameters.items()}
+
+
     # Print the final loaded parameters for verification
     print(f"Final Parameters: {parameters}")
 
