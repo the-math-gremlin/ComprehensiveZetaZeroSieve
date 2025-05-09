@@ -13,7 +13,9 @@ def run_sieve(delta_curve, envelope, within_band_mask, known_zeros, params, limi
     mu_t = gaussian_filter1d(delta_curve, sigma)
 
     # Calculate the expected envelope
-    envelope_reconstructed = mu_t + A * np.sin(2 * np.pi * f * np.log(np.arange(1, len(delta_curve) + 1) + 1))
+    phi = 0 
+    envelope_reconstructed = mu_t + A * np.sin(2 * np.pi * f * np.log(np.arange(1, len(delta_curve) + 1) + 1) + phi)
+
 
     # Convert known zeros to indices
     known_zero_indices = set(int(round(zero)) for zero in known_zeros)
