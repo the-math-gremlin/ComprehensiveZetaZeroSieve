@@ -36,7 +36,8 @@ def test_zero_proximity_check(debug_mode=False):
         print("[WARNING] Parameter file '../data/sieve_parameters.txt' not found. Using default parameters.")
     delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros = load_data_files()
     tolerance_radius = int(np.ceil(parameters["Tolerance"] * 10))
-    known_zero_indices = set(np.round(zeta_zeros * 1000000).astype(int))
+    known_zero_indices = set(np.floor(zeta_zeros * 1000000 + 0.5).astype(int))
+    print(f"[INFO] Loaded {len(known_zero_indices)} known zero indices (after scaling and rounding)")
     print(f"[INFO] Loaded {len(known_zero_indices)} known zero indices (after rounding)")
 
     # Run the sieve in diagnostic mode
@@ -45,12 +46,14 @@ def test_zero_proximity_check(debug_mode=False):
     )
 
     # Sanity check: ensure known_zero_indices is populated
-    assert len(known_zero_indices) == 100000, f"Expected 100,000 known zeros, got {len(known_zero_indices)}"
+    assert len(known_zero_indices) == 100000, f"Expected 100,000 known zeros, got {len(known_zero_indices)}. Consider checking the scaling logic or data precision." f"Expected 100,000 known zeros, got {len(known_zero_indices)}"
 
     # Check if any known zeros were missed
     missing = []
     for zero in known_zero_indices:
         if zero not in known_zero_indices:
+            if debug_mode:
+                print(f"[DEBUG] Zero {zero} not in known_zero_indices after scaling and rounding")
             if debug_mode:
                 print(f"[DEBUG] Zero {zero} not in known_zero_indices after rounding")
             if debug_mode:
