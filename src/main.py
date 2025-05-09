@@ -1,45 +1,40 @@
-import numpy as np
-from config import PARAMETERS_FILE, DELTA_CURVE_FILE, DYNAMIC_SINE_ENVELOPE_FILE, WITHIN_BAND_MASK_FILE, ZETA_ZEROS_FILE
-from utils import load_parameters, save_results, log
-from sieve import run_sieve
-from verify_data import verify_data
 import argparse
+import logging
+from config import load_parameters
+from sieve import run_sieve
+from utils import load_data_files
 
 def main():
-    # Verify the data files before running the sieve
-    if not verify_data():
-        print("[ERROR] Data verification failed. Please fix the data files and try again.")
-        return
-
-    # Load parameters
-    params = load_parameters(PARAMETERS_FILE)
-
-    # Load data files
-    delta_curve = np.load(DELTA_CURVE_FILE)
-    dynamic_sine_envelope = np.load(DYNAMIC_SINE_ENVELOPE_FILE)
-    within_band_mask = np.load(WITHIN_BAND_MASK_FILE)
-    zeta_zeros = np.load(ZETA_ZEROS_FILE)
-
-    # Run the sieve
-    try:
-        results = run_sieve(params, delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros)
-        
-        # Print results if verbose mode is enabled
-        if args.verbose:
-            for key, value in results.items():
-                print(f"{key}: {len(value)}")
-
-        # Save results
-        save_results("sieve_results.txt", results)
-        log("[INFO] Sieve run completed successfully.")
-
-    except Exception as e:
-        print(f"[ERROR] Sieve run failed: {e}")
-
-if __name__ == "__main__":
+    # Set up argument parsing
     parser = argparse.ArgumentParser(description="Comprehensive Zeta Zero Sieve")
-    parser.add_argument("--mode", choices=["run", "test"], default="run", help="Mode to run the sieve in")
-    parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
+    parser.add_argument("--mode", type=str, default="run", help="Mode to run the sieve (run, test, verify)")
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
+    parser.add_argument("--limit", type=int, default=100000, help="Limit the number of indices to check")
     args = parser.parse_args()
 
+    # Set up logging
+    logging.basicConfig(level=logging.INFO if args.verbose else logging.WARNING, format="[%(levelname)s] %(message)s")
+
+    # Load parameters
+    params = load_parameters()
+    logging.info(f"Final Parameters: {params}")
+
+    # Load data files
+    delta_curve, envelope, within_band_mask, known_zeros = load_data_files()
+    logging.info(f"Delta Curve Length: {len(delta_curve)}")
+    logging.info(f"Within Band Mask Length: {len(within_band_mask)}")
+    logging.info(f"Number of Known Zeros: {len(known_zeros)}")
+
+    # Run the sieve with the specified index limit
+    true_positives, false_negatives, false_positives = run_sieve(delta_curve, envelope, within_band_mask, known_zeros, params, limit=args.limit)
+
+    # Print the final counts
+    logging.info(f"True Positives: {true_positives}")
+    logging.info(f"False Negatives: {false_negatives}")
+    logging.info(f"False Positives: {false_positives}")
+    print(f"True Positives: {true_positives}")
+    print(f"False Negatives: {false_negatives}")
+    print(f"False Positives: {false_positives}")
+
+if __name__ == "__main__":
     main()
