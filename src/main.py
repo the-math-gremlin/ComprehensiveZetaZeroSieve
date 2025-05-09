@@ -14,7 +14,8 @@ def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, 
     false_negatives = 0
     false_positives = 0
     missed_zeros = []
-    known_zero_indices = set(np.round(zeta_zeros).astype(int))
+    known_zero_indices = set(zeta_zeros)
+
 
     # Prepare the envelope for comparison
     t_values = np.arange(1, len(delta_curve) + 1)
