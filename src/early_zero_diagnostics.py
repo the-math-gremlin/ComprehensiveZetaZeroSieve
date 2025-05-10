@@ -1,27 +1,29 @@
 import numpy as np
-import os
+from utils import load_data_files
 
-# Load the required data files
-data_dir = os.path.abspath('../data')
-delta_curve = np.load(os.path.join(data_dir, 'delta_curve.npy'))
-dynamic_sine_envelope = np.load(os.path.join(data_dir, 'dynamic_sine_envelope.npy'))
-zeta_zeros = np.load(os.path.join(data_dir, 'zeta_zeros.npy'))
-
-# Set the number of initial points to inspect
-inspection_count = 20
-
-print("\n=== Early Zero Diagnostics ===")
-print(f"{'Index':>6} | {'t_value':>12} | {'Delta Curve':>15} | {'Envelope':>15} | {'Known Zero':>12}")
-print("-" * 70)
-
-for idx in range(inspection_count):
-    t_value = zeta_zeros[idx]
-    delta_value = delta_curve[idx]
-    envelope_value = dynamic_sine_envelope[idx]
+def early_zero_diagnostics(limit=20):
+    # Load all necessary data files
+    delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros = load_data_files()
     
-    # Check if this index corresponds to a known zero
-    is_zero = t_value in zeta_zeros
+    # Prepare the diagnostic output
+    print("\n=== Early Zero Diagnostics ===")
+    print("{:<8} | {:<15} | {:<15} | {:<15} | {:<15}".format("Index", "t_value", "Delta Curve", "Envelope", "Known Zero"))
+    print("-" * 70)
     
-    print(f"{idx:>6} | {t_value:>12.6f} | {delta_value:>15.6f} | {envelope_value:>15.6f} | {'Yes' if is_zero else 'No':>12}")
+    for idx in range(min(limit, len(zeta_zeros))):
+        t_value = zeta_zeros[idx]
+        delta_val = delta_curve[idx]
+        envelope_val = dynamic_sine_envelope[idx]
+        
+        # Check if this is a known zero (within tolerance)
+        is_known_zero = np.isclose(delta_val, envelope_val, rtol=1e-12, atol=1e-12)
+        
+        # Print the diagnostics for this zero
+        print("{:<8} | {:<15.6f} | {:<15.6f} | {:<15.6f} | {}".format(
+            idx, t_value, delta_val, envelope_val, "Yes" if is_known_zero else "No"
+        ))
+    
+    print("\nDiagnostic check complete.\n")
 
-print("\nDiagnostic check complete.\n")
+if __name__ == "__main__":
+    early_zero_diagnostics(limit=20)
