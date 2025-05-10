@@ -18,6 +18,9 @@ def main():
     print(f"Detected {len(detected_zeros)} potential zeros")
     for zero in detected_zeros[:20]:  # Print the first 20 for sanity check
         print(f"t = {zero:.10f}")
+        print("\n=== Debug Information ===")
+        print(f"Sample Delta Curve: {delta_curve[:10]}")
+        print(f"Sample Envelope: {envelope[:10]}")
 
     print("\nSieve complete.")
 
