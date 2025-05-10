@@ -1,23 +1,23 @@
 import numpy as np
 
-def verify_detected_zeros(detected_file="../data/detected_zeros.npy", known_file="../data/known_zeros.npy"):
+def verify_detected_zeros(detected_file="../data/detected_zeros.npy", known_file="../data/zeta_zeros.npy"):
     # Load the detected and known zeros
     detected_zeros = np.load(detected_file)
-    known_zeros = np.load(known_file)
+    zeta_zeros = np.load(known_file)
 
     # Sort for direct comparison
     detected_zeros = np.sort(detected_zeros)
-    known_zeros = np.sort(known_zeros)
+    zeta_zeros = np.sort(zeta_zeros)
 
     # Check for matches
-    true_positives = np.intersect1d(detected_zeros, known_zeros)
-    false_positives = np.setdiff1d(detected_zeros, known_zeros)
-    missed_zeros = np.setdiff1d(known_zeros, detected_zeros)
+    true_positives = np.intersect1d(detected_zeros, zeta_zeros)
+    false_positives = np.setdiff1d(detected_zeros, zeta_zeros)
+    missed_zeros = np.setdiff1d(zeta_zeros, detected_zeros)
 
     # Print summary
     print("\n=== Zero Verification Summary ===")
     print(f"Total Detected Zeros: {len(detected_zeros)}")
-    print(f"Total Known Zeros: {len(known_zeros)}")
+    print(f"Total Known Zeros: {len(zeta_zeros)}")
     print(f"True Positives: {len(true_positives)}")
     print(f"False Positives: {len(false_positives)}")
     print(f"Missed Zeros: {len(missed_zeros)}")
