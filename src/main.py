@@ -14,6 +14,12 @@ def main():
     print("\n=== Debug Information ===")
     print(f"Sample Delta Curve: {delta_curve[:10]}")
     print(f"Sample Envelope: {envelope[:10]}")
+    print("\n=== Debug Information ===")
+    print(f"Sample Delta Curve: {delta_curve[:10]}")
+    print(f"Sample Envelope: {envelope[:10]}")
+    print(f"Max Envelope Value: {np.max(envelope)}")
+    print(f"Min Envelope Value: {np.min(envelope)}")
+
 
     # Run the sieve
     detected_zeros = [t for t, delta, env in zip(t_values, delta_curve, envelope) if abs(delta) <= config.TOLERANCE * abs(env)]
