@@ -47,6 +47,7 @@ def calculate_phase(values):
     Calculate the phase of a given curve, ensuring consistent handling of 2π modularity.
     This function assumes the input is already in float64 precision.
     """
-    # Calculate the phase as the fractional part of the natural log divided by the base-3 log
-    phase = (2 * np.pi * np.log(values + 1) / np.log(3)) % (2 * np.pi)
+    # Replace negative or zero values to avoid log errors
+    safe_values = np.maximum(values, 1e-16)  # Prevent log(0) and negative values
+    phase = (2 * np.pi * np.log(safe_values) / np.log(3)) % (2 * np.pi)
     return phase.astype(np.float64)
