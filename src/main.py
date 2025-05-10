@@ -3,7 +3,7 @@ import os
 from utils import load_parameters, load_data_files
 from scipy.ndimage import gaussian_filter1d
 
-def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, parameters, t_values=None, limit=None, verbose=True):
+def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, parameters, t_values=None, limit=None, verbose=True):
     # Load parameters
     amplitude = parameters["Amplitude"]
     base_frequency = parameters["Base_Frequency"]
@@ -23,49 +23,25 @@ def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, 
         (2 * np.pi * base_frequency * log_t_values) / np.log(3) + phase_shift
     )
 
-    # Track correctly identified zeros
-    true_positives = 0
-    false_positives = 0
-    missed_zeros = []
-    detected_zeros = set()
+    # Track identified zeros
+    detected_zeros = []
 
-    # Compare known zeros to the reconstructed envelope
-    for zero in zeta_zeros:
-        index = int(zero)  # Exact index, no rounding
-        if index < len(envelope_reconstructed):
-            delta_value = delta_curve[index]
-            envelope_value = envelope_reconstructed[index]
-            within_band = np.abs(delta_value - envelope_value) <= tolerance
-            
-            if within_band:
-                true_positives += 1
-                detected_zeros.add(zero)
-            else:
-                missed_zeros.append(zero)
-                if verbose:
-                    print(f"[DEBUG] Missed zero at t = {zero:.12f}, Delta = {delta_value:.6f}, Envelope = {envelope_value:.6f}")
-        else:
-            missed_zeros.append(zero)
-            if verbose:
-                print(f"[DEBUG] Zero {zero} is out of bounds for the envelope length.")
+    # Sieve logic - independent of known zeros
+    for idx, (delta_value, envelope_value) in enumerate(zip(delta_curve, envelope_reconstructed)):
+        within_band = np.abs(delta_value - envelope_value) <= tolerance
+        if within_band:
+            detected_zeros.append(idx)
 
-    # Identify false positives
-    false_positives = []
-    for idx in np.where(within_band_mask == 1)[0]:
-        if idx not in detected_zeros:
-            false_positives.append(idx)
-
+    # Print summary
     if verbose:
-        print(f"True Positives: {true_positives}")
-        print(f"False Positives: {len(false_positives)}")
-        print(f"Missed Zeros: {len(missed_zeros)}")
-        print(f"False Positive Indices: {[int(idx) for idx in false_positives[:10]]}")
+        print(f"Identified {len(detected_zeros)} potential zeros.")
+        print(f"First 20 detected zeros: {detected_zeros[:20]}")
 
-    return true_positives, len(missed_zeros), len(false_positives), missed_zeros
+    return detected_zeros
 
 
 if __name__ == "__main__":
     parameters = load_parameters()
-    delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros = load_data_files()
+    delta_curve, dynamic_sine_envelope, within_band_mask, _ = load_data_files()
     t_values = np.arange(1, len(delta_curve) + 1, dtype=np.float64)
-    run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, parameters, t_values=t_values, limit=None, verbose=True)
+    detected_zeros = run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, parameters, t_values=t_values, limit=None, verbose=True)
