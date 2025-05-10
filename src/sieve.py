@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter1d
 
 # Load known zeta zeros
-zeta_zeros = np.load('zeta_zeros.npy')
+zeta_zeros = np.load('../data/zeta_zeros.npy')
 
 # Final, optimized sieve parameters
 sigma_final = 3.6  # Optimized smoothing width
