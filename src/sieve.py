@@ -3,7 +3,7 @@ import math
 from math import exp, sqrt, pi
 
 # Load known zeta zeros (first 100,000 imaginary parts) and reference delta
-zeta_zeros = np.load("zeta_zeros.npy")            # known nontrivial zeros
+zeta_zeros = np.load("../data/zeta_zeros.npy")            # known nontrivial zeros
 delta_ref  = np.load("delta_curve.npy")           # reference raw drift Δ(t) from data
 
 # Compute Riemann-Siegel theta approximately and accumulate phase difference
