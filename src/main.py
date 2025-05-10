@@ -27,6 +27,7 @@ def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, 
     true_positives = 0
     false_positives = 0
     missed_zeros = []
+    detected_zeros = set()
 
     # Compare known zeros to the reconstructed envelope
     for zero in zeta_zeros:
@@ -38,6 +39,7 @@ def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, 
             
             if within_band:
                 true_positives += 1
+                detected_zeros.add(zero)
             else:
                 missed_zeros.append(zero)
                 if verbose:
@@ -48,14 +50,18 @@ def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, 
                 print(f"[DEBUG] Zero {zero} is out of bounds for the envelope length.")
 
     # Identify false positives
-    false_positives = np.sum(within_band_mask) - true_positives
+    false_positives = []
+    for idx in np.where(within_band_mask == 1)[0]:
+        if idx not in detected_zeros:
+            false_positives.append(idx)
 
     if verbose:
         print(f"True Positives: {true_positives}")
-        print(f"False Positives: {false_positives}")
+        print(f"False Positives: {len(false_positives)}")
         print(f"Missed Zeros: {len(missed_zeros)}")
+        print(f"False Positive Indices: {false_positives[:10]}")  # Print first 10 false positives
 
-    return true_positives, len(missed_zeros), false_positives, missed_zeros
+    return true_positives, len(missed_zeros), len(false_positives), missed_zeros
 
 
 if __name__ == "__main__":
