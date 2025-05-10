@@ -27,11 +27,11 @@ def calculate_envelope(t_values):
     
     return envelope_adjusted
 
-def run_sieve(delta_curve, envelope, tolerance):
+def run_sieve(t_values, delta_curve, envelope, tolerance):
     # Find zeros where delta is within the envelope tolerance
     detected_zeros = []
-    for i, (delta, env) in enumerate(zip(delta_curve, envelope)):
+    for i, (t, delta, env) in enumerate(zip(t_values, delta_curve, envelope)):
         if abs(delta) <= tolerance * env:
-            detected_zeros.append(i)
+            detected_zeros.append(t)
     
     return detected_zeros
