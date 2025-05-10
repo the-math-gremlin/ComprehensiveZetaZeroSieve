@@ -1,12 +1,11 @@
 import numpy as np
 
 # Core sieve parameters
-AMPLITUDE = 15.0  # Slightly above the empirical 12.2
+AMPLITUDE = np.pi * abs(1 / np.log(3) - 1 / np.log(np.pi)) / 2
 BASE_FREQUENCY = abs(1 / np.log(3) - 1 / np.log(np.pi))
 SMOOTHING_SIGMA = 5.0
-PHASE_SHIFT = 0.0  # Adjust as needed
 TOLERANCE = 0.875
-
+PHASE_SHIFT = 0.0
 
 # t-value generation
 MIN_T = 0  # Start at the first known zero
