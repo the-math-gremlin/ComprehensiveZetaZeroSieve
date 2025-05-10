@@ -16,6 +16,7 @@ def main():
     print(f"Sample Envelope: {envelope[:10]}")
     print(f"Max Envelope Value: {np.max(envelope)}")
     print(f"Min Envelope Value: {np.min(envelope)}")
+    print(f"\nAmplitude: {config.AMPLITUDE}")
 
     # Run the sieve
     detected_zeros = run_sieve(t_values, delta_curve, envelope, config.TOLERANCE)
