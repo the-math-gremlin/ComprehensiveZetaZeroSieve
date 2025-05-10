@@ -19,7 +19,7 @@ def calculate_envelope(t_values):
     
     # Center the envelope correctly around the target mean
     mu_t = amplitude / 2  # Use the midpoint of the amplitude as the center
-        envelope = mu_t + sine_wave
+    envelope = mu_t + sine_wave
     
     return envelope
 
