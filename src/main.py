@@ -1,3 +1,7 @@
+import numpy as np
+import config
+from utils import calculate_modular_drift, calculate_envelope
+
 def main():
     # Generate dynamic t-values for the critical line
     t_values = np.linspace(config.MIN_T, config.MAX_T, config.NUM_POINTS)
