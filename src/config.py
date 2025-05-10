@@ -11,7 +11,7 @@ ZETA_ZEROS_FILE = "../data/zeta_zeros.npy"
 
 # Default parameters for the sieve
 DEFAULT_PARAMETERS = {
-    "Amplitude": 12.2,
+    "Amplitude": np.pi * abs(1 / np.log(3) - 1 / np.log(np.pi)) / 2,
     "Frequency": 0.001,
     "Smoothing_Sigma": 5.0,
     "Tolerance": 0.875,
