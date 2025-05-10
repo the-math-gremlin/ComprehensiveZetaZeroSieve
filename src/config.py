@@ -1,7 +1,7 @@
 import numpy as np
 
 # Core sieve parameters (known to work)
-AMPLITUDE = 12.2
+AMPLITUDE = np.pi * abs(1 / np.log(3) - 1 / np.log(np.pi)) / 2
 BASE_FREQUENCY = abs(1 / np.log(3) - 1 / np.log(np.pi))
 SMOOTHING_SIGMA = 5.0
 TOLERANCE = 0.875
