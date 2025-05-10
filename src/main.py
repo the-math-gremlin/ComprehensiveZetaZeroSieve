@@ -1,7 +1,7 @@
 import numpy as np
 
 # Load known zeros and t-values
-known_zeros = np.loadtxt("../data/zeta_zeros.npy")
+known_zeros = np.load("../data/zeta_zeros.npy")
 t_values = np.loadtxt("../data/t_values.txt")
 
 # Set parameters
