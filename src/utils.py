@@ -42,4 +42,11 @@ def load_data_files():
     except ValueError as e:
         print(f"[ERROR] Data length mismatch: {e}")
         raise
-
+def calculate_phase(values):
+    """
+    Calculate the phase of a given curve, ensuring consistent handling of 2π modularity.
+    This function assumes the input is already in float64 precision.
+    """
+    # Calculate the phase as the fractional part of the natural log divided by the base-3 log
+    phase = (2 * np.pi * np.log(values + 1) / np.log(3)) % (2 * np.pi)
+    return phase.astype(np.float64)
