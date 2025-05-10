@@ -2,20 +2,20 @@ import numpy as np
 import config
 
 def calculate_modular_drift(t_values):
-    # Calculate the drift component using the corrected base frequency
-    mu_t = (2 * np.pi * config.BASE_FREQUENCY * np.log(t_values + 1)) / np.log(3) + config.PHASE_SHIFT
+    # Core drift function using theoretical base frequency
+    mu_t = (2 * np.pi * config.BASE_FREQUENCY * np.log(t_values + 1)) / np.log(3)
     return mu_t
 
 def calculate_envelope(t_values):
-    # Calculate the envelope using the corrected amplitude and base frequency
-    mu_t = calculate_modular_drift(t_values)
-    envelope = mu_t + config.AMPLITUDE * np.sin(config.BASE_FREQUENCY * np.log(t_values + 1) + config.PHASE_SHIFT)
+    # Theoretical envelope calculation
+    amplitude = config.AMPLITUDE
+    base_frequency = config.BASE_FREQUENCY
+    phase_shift = config.PHASE_SHIFT
+    
+    # Direct sine envelope calculation
+    envelope = amplitude * np.sin(base_frequency * np.log(t_values + 1) + phase_shift)
+    
+    # Center the envelope
+    envelope += amplitude / 2
+    
     return envelope
-
-def run_sieve(t_values, delta_curve, envelope):
-    # Run the sieve to identify potential zeros
-    detected_zeros = []
-    for t, delta, env in zip(t_values, delta_curve, envelope):
-        if abs(delta - env) <= config.TOLERANCE:
-            detected_zeros.append(t)
-    return detected_zeros
