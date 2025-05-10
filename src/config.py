@@ -8,6 +8,6 @@ TOLERANCE = 0.875
 PHASE_SHIFT = 0.0
 
 # t-value generation
-MIN_T = 10  # Start at the first known zero
+MIN_T = 0  # Start at the first known zero
 MAX_T = 100000.0   # Adjust as needed
 NUM_POINTS = 100000
