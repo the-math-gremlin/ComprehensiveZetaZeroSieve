@@ -20,7 +20,7 @@ def main():
     envelope, mu_t = calculate_envelope(delta_curve, t_values, amplitude, frequency, phase_shift, smoothing_sigma)
 
     # Run the sieve
-    detected_zeros = run_sieve(delta_curve, envelope, tolerance)
+    detected_zeros = run_sieve(delta_curve, envelope, mu_t, tolerance)
 
     # Save the outputs for verification
     np.save("../data/delta_curve.npy", delta_curve)
