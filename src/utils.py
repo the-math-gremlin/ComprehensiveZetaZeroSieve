@@ -42,9 +42,3 @@ def load_data_files():
     except ValueError as e:
         print(f"[ERROR] Data length mismatch: {e}")
         raise
-def check_known_zero(t_value, zeta_zeros, tolerance=1e-8):
-    """
-    Check if a given t_value is a known zeta zero within a small tolerance.
-    """
-    return np.any(np.abs(zeta_zeros - t_value) < tolerance)
-
