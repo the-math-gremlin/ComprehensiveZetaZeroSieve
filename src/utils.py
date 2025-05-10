@@ -7,7 +7,7 @@ def calculate_modular_drift(t_values):
     mu_t = (2 * np.pi * config.BASE_FREQUENCY * np.log(t_values + 1)) / np.log(3)
     return mu_t
 
-def calculate_dynamic_envelope(t_values):
+def calculate_envelope(t_values):
     # Calculate the local mean (mu_t) using a Gaussian filter for dynamic centering
     base_frequency = config.BASE_FREQUENCY
     amplitude = config.AMPLITUDE
