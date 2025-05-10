@@ -10,10 +10,10 @@ def calculate_modular_drift(t_values):
     return delta_curve
 
 def calculate_envelope(t_values):
-    # Calculate the envelope function
     amplitude = config.AMPLITUDE
     frequency = config.BASE_FREQUENCY
-    envelope = amplitude * np.sin(frequency * np.log(t_values + 1))
+    phase_shift = config.PHASE_SHIFT
+    envelope = amplitude * np.sin(frequency * np.log(t_values + 1) + phase_shift)
     return np.abs(envelope)
 
 def run_sieve(t_values, delta_curve, envelope, tolerance):
