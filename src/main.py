@@ -1,34 +1,41 @@
 import numpy as np
-from utils import calculate_modular_drift, calculate_envelope, run_sieve
-import config
-import os
 
-def main():
-    # Load t values
-    t_values = np.arange(1, 100001, dtype=np.float64)
+# Load known zeros and t-values
+known_zeros = np.loadtxt("../data/zeta_zeros.txt")
+t_values = np.loadtxt("../data/t_values.txt")
 
-    # Calculate the modular drift
-    delta_curve = calculate_modular_drift(t_values)
+# Set parameters
+AMPLITUDE = np.pi * np.abs(1 / np.log(3) - 1 / np.log(np.pi))
+FREQUENCY = 1 / (2 * np.pi * np.log(3))
+PHASE_SHIFT = 0  # Set to zero for now, adjust later if needed
+TOLERANCE = 1e-10
 
-    # Calculate the envelope
-    amplitude = config.AMPLITUDE
-    frequency = config.FREQUENCY
-    phase_shift = config.PHASE_SHIFT
-    smoothing_sigma = config.SMOOTHING_SIGMA
-    tolerance = config.TOLERANCE
+# Calculate delta curve
+delta_curve = np.abs(np.log(t_values / np.pi) - np.log(t_values / 3))
+print(f"[DEBUG] Delta Curve Length: {len(delta_curve)}")
+print(f"[DEBUG] Sample Delta Curve: {delta_curve[:10]}")
 
-    envelope, mu_t = calculate_envelope(delta_curve, t_values, amplitude, frequency, phase_shift, smoothing_sigma)
+# Calculate sine envelope
+envelope = AMPLITUDE * np.sin(2 * np.pi * FREQUENCY * np.log(t_values))
+print(f"[DEBUG] Envelope Length: {len(envelope)}")
+print(f"[DEBUG] Sample Envelope: {envelope[:10]}")
 
-    # Run the sieve
-    detected_zeros = run_sieve(delta_curve, envelope, mu_t, tolerance)
+# Identify zeros
+potential_zeros = []
+for i, (delta, env) in enumerate(zip(delta_curve, envelope)):
+    if abs(delta - env) < TOLERANCE:
+        potential_zeros.append(t_values[i])
 
-    # Save the outputs for verification
-    np.save("../data/delta_curve.npy", delta_curve)
-    np.save("../data/dynamic_sine_envelope.npy", envelope)
-    np.save("../data/detected_zeros.npy", detected_zeros)
-    np.save("../data/centerline.npy", mu_t)
+print(f"[INFO] Detected {len(potential_zeros)} potential zeros.")
 
-    print("[INFO] Drift, envelope, and zeros calculated successfully.")
+# Verify zeros
+true_positives = sum(1 for zero in potential_zeros if zero in known_zeros)
+false_positives = len(potential_zeros) - true_positives
+missed_zeros = len(known_zeros) - true_positives
 
-if __name__ == "__main__":
-    main()
+print("\n=== Zero Verification Summary ===")
+print(f"Total Detected Zeros: {len(potential_zeros)}")
+print(f"Total Known Zeros: {len(known_zeros)}")
+print(f"True Positives: {true_positives}")
+print(f"False Positives: {false_positives}")
+print(f"Missed Zeros: {missed_zeros}")
