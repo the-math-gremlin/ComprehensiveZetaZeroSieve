@@ -19,11 +19,6 @@ def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, 
         (2 * np.pi * base_frequency * np.log(t_values + 1)) / np.log(3) + phase_shift
     )
 
-
-    # Reconstruct the dynamic sine envelope with precise log scaling
-    t_values = np.arange(1, len(delta_curve) + 1, dtype=np.float64)
-    envelope_reconstructed = mu_t + amplitude * np.sin((2 * np.pi * base_frequency * np.log(t_values + 1)) / np.log(3))
-
     # Track correctly identified zeros
     true_positives = 0
     false_positives = 0
