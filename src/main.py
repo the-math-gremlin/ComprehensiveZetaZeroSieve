@@ -2,8 +2,10 @@ import numpy as np
 import os
 from utils import load_parameters, load_data_files
 from scipy.ndimage import gaussian_filter1d
+t_values = np.arange(1, len(delta_curve) + 1, dtype=np.float64)
 
-def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, parameters, limit=None, verbose=False):
+
+def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, parameters, t_values=t_values, limit=None, verbose=True):
     # Load parameters
     amplitude = parameters["Amplitude"]
     base_frequency = parameters["Base_Frequency"]
