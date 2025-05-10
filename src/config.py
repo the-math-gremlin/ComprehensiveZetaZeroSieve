@@ -13,4 +13,4 @@ MAX_T = 100000.0
 NUM_POINTS = 100000
 
 # Envelope scaling (dynamic adjustment)
-ENVELOPE_SCALING_FACTOR = 1.5
+ENVELOPE_SCALING_FACTOR = 2.0  # Adjust this as needed
