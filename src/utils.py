@@ -13,7 +13,14 @@ def calculate_envelope(t_values):
     amplitude = config.AMPLITUDE
     frequency = config.BASE_FREQUENCY
     phase_shift = config.PHASE_SHIFT
+    
+    # Calculate the envelope using the correct scaling
     envelope = amplitude * np.sin(frequency * np.log(t_values + 1) + phase_shift)
+    
+    # Center the envelope around mu(t) if needed (check if this matches your original paper)
+    mu_t = np.mean(envelope)  # Simple approximation
+    envelope = mu_t + envelope
+    
     return np.abs(envelope)
 
 def run_sieve(t_values, delta_curve, envelope, tolerance):
