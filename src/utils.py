@@ -42,12 +42,9 @@ def load_data_files():
     except ValueError as e:
         print(f"[ERROR] Data length mismatch: {e}")
         raise
-def calculate_phase(values):
+def check_known_zero(t_value, zeta_zeros, tolerance=1e-8):
     """
-    Calculate the phase of a given curve, ensuring consistent handling of 2π modularity.
-    This function assumes the input is already in float64 precision.
+    Check if a given t_value is a known zeta zero within a small tolerance.
     """
-    # Replace negative or zero values to avoid log errors
-    safe_values = np.maximum(values, 1e-16)  # Prevent log(0) and negative values
-    phase = (2 * np.pi * np.log(safe_values) / np.log(3)) % (2 * np.pi)
-    return phase.astype(np.float64)
+    return np.any(np.abs(zeta_zeros - t_value) < tolerance)
+
