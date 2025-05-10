@@ -31,15 +31,24 @@ def calculate_envelope(delta_curve, t_values, amplitude, frequency, phase_shift,
 
     return envelope.astype(np.float64), mu_t.astype(np.float64)
 
-def run_sieve(delta_curve, envelope, tolerance):
+import numpy as np
+
+def run_sieve(delta_curve, envelope, mu_t, tolerance=0.875):
     """
     Identify potential zeros based on the drift and envelope conditions.
     """
     detected_zeros = []
-    for i in range(len(delta_curve)):
-        if abs(delta_curve[i] - envelope[i]) <= tolerance:
-            detected_zeros.append(i + 1)  # Use 1-based indexing to match known zeros
-    
+
+    # Find local minima of the delta curve
+    for i in range(1, len(delta_curve) - 1):
+        if delta_curve[i] < delta_curve[i - 1] and delta_curve[i] < delta_curve[i + 1]:
+            # Check if the local minimum is within the envelope tolerance
+            lower_bound = mu_t[i] - envelope[i]
+            if abs(delta_curve[i] - lower_bound) < tolerance:
+                detected_zeros.append(i + 1)  # Use 1-based indexing to match known zeros
+
     print(f"[INFO] Detected {len(detected_zeros)} potential zeros.")
+    return detected_zeros
+
     return detected_zeros
 
