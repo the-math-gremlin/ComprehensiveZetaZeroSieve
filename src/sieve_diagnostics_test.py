@@ -1,33 +1,38 @@
 import numpy as np
-import sys
-import os
-sys.path.insert(0, os.path.abspath('./src'))
 from utils import load_parameters, load_data_files
 from main import run_sieve
 
-def test_zero_proximity_check(debug_mode=False):
-    # Load parameters and data
-    parameters = load_parameters()
-    parameters_file = os.path.abspath('../data/sieve_parameters.txt')
-    if os.path.exists(parameters_file):
-        print(f"[INFO] Loading parameters from {parameters_file}")
-    else:
-        print("[WARNING] Parameter file '../data/sieve_parameters.txt' not found. Using default parameters.")
-    delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros = load_data_files()
-    tolerance_radius = parameters["Tolerance"]
-    print(f"[INFO] Using floating point tolerance of {tolerance_radius}")
-    known_zeros = np.array(zeta_zeros, dtype=np.float64)
-    print(f"[INFO] Loaded {len(known_zeros)} known zeros for direct precision matching")
+def verify_zeros(detected_zeros, zeta_zeros, tolerance=1e-8):
+    """
+    Verify that all detected zeros are actual known zeros.
+    """
+    matched_zeros = []
+    false_positives = []
 
-    # Run the sieve in diagnostic mode
-    true_positives, false_negatives, false_positives, missed_zeros = run_sieve(
-        delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, parameters, limit=None, verbose=True
-    )
+    for zero in detected_zeros:
+        if np.any(np.isclose(zero, zeta_zeros, rtol=1e-12, atol=tolerance)):
+            matched_zeros.append(zero)
+        else:
+            false_positives.append(zero)
 
-    # Print the summary in the correct format for parameter_sweep.py
-    print(f"True Positives: {true_positives}")
-    print(f"False Positives: {false_positives}")
-    print(f"Missed Zeros: {len(missed_zeros)}")
+    return matched_zeros, false_positives
+
 
 if __name__ == "__main__":
-    test_zero_proximity_check(debug_mode=True)
+    # Load data
+    parameters = load_parameters()
+    delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros = load_data_files()
+    t_values = np.arange(1, len(delta_curve) + 1, dtype=np.float64)
+
+    # Run the sieve independently of known zeros
+    detected_zeros = run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, parameters, t_values=t_values, limit=None, verbose=True)
+
+    # Verify the detected zeros
+    matched_zeros, false_positives = verify_zeros(detected_zeros, zeta_zeros)
+
+    # Print summary
+    print("\n=== Verification Results ===")
+    print(f"Detected Zeros: {len(detected_zeros)}")
+    print(f"Matched Zeros: {len(matched_zeros)}")
+    print(f"False Positives: {len(false_positives)}")
+    print(f"First 20 False Positives: {false_positives[:20]}\n")
