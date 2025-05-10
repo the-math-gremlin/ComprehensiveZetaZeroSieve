@@ -2,23 +2,25 @@ import numpy as np
 import os
 from utils import load_parameters, load_data_files
 from scipy.ndimage import gaussian_filter1d
-t_values = np.arange(1, len(delta_curve) + 1, dtype=np.float64)
 
-
-def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, parameters, t_values=t_values, limit=None, verbose=True):
+def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, parameters, t_values=None, limit=None, verbose=True):
     # Load parameters
     amplitude = parameters["Amplitude"]
     base_frequency = parameters["Base_Frequency"]
     smoothing_sigma = parameters["Smoothing_Sigma"]
     tolerance = parameters["Tolerance"]
+    phase_shift = parameters["Phase_Shift"]
 
     # Calculate the smoothed centerline μ(t)
     mu_t = gaussian_filter1d(delta_curve, smoothing_sigma)
 
-    # Phase shift
-    phase_shift = parameters["Phase_Shift"]
+    # Use exact float64 for t_values
+    if t_values is None:
+        t_values = np.arange(1, len(delta_curve) + 1, dtype=np.float64)
+
+    log_t_values = np.log(t_values + 1).astype(np.float64)
     envelope_reconstructed = mu_t + amplitude * np.sin(
-        (2 * np.pi * base_frequency * np.log(t_values + 1)) / np.log(3) + phase_shift
+        (2 * np.pi * base_frequency * log_t_values) / np.log(3) + phase_shift
     )
 
     # Track correctly identified zeros
@@ -28,7 +30,7 @@ def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, 
 
     # Compare known zeros to the reconstructed envelope
     for zero in zeta_zeros:
-        index = int(np.floor(zero))
+        index = int(zero)  # Exact index, no rounding
         if index < len(envelope_reconstructed):
             delta_value = delta_curve[index]
             envelope_value = envelope_reconstructed[index]
@@ -59,4 +61,5 @@ def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, 
 if __name__ == "__main__":
     parameters = load_parameters()
     delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros = load_data_files()
-    run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, parameters, limit=None, verbose=True)
+    t_values = np.arange(1, len(delta_curve) + 1, dtype=np.float64)
+    run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, parameters, t_values=t_values, limit=None, verbose=True)
