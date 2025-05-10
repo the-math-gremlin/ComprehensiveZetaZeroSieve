@@ -27,3 +27,12 @@ def calculate_dynamic_envelope(t_values):
         envelope = gaussian_filter1d(envelope, sigma=smoothing_sigma)
     
     return envelope
+
+def run_sieve(t_values, delta_curve, envelope, tolerance):
+    # Identify potential zeros
+    potential_zeros = []
+    for i in range(1, len(delta_curve) - 1):
+        # Check if the delta crosses the envelope
+        if abs(delta_curve[i]) <= envelope[i] * tolerance:
+            potential_zeros.append(t_values[i])
+    return potential_zeros
