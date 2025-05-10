@@ -17,8 +17,7 @@ def calculate_envelope(t_values):
     sine_wave = amplitude * np.sin(base_frequency * np.log(t_values + 1) + phase_shift)
     
     # Center the envelope correctly
-    envelope_center = amplitude / 2
-    envelope_adjusted = envelope_center + sine_wave
+    envelope = mu_t + AMPLITUDE * np.sin(BASE_FREQUENCY * np.log(t_values + 1) + PHASE_SHIFT)
 
     # Optional smoothing to reduce noise
     if smoothing_sigma > 0:
