@@ -16,8 +16,7 @@ def calculate_envelope(t_values):
 
     # Center the envelope around the average amplitude
     sine_wave = amplitude * np.sin(frequency * np.log(t_values + 1) + phase_shift)
-    envelope = amplitude / 2 + sine_wave  # Center around half amplitude
-
+    envelope = amplitude + sine_wave
     
     return envelope
 
