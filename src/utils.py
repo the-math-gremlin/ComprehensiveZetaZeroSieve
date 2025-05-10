@@ -2,36 +2,20 @@ import numpy as np
 import config
 
 def calculate_modular_drift(t_values):
-    base_frequency = config.BASE_FREQUENCY
-    phase_shift = config.PHASE_SHIFT
-    mu_t = (2 * np.pi * base_frequency * np.log(t_values + 1)) / np.log(3) + phase_shift
+    # Calculate the drift component using the corrected base frequency
+    mu_t = (2 * np.pi * config.BASE_FREQUENCY * np.log(t_values + 1)) / np.log(3) + config.PHASE_SHIFT
     return mu_t
 
 def calculate_envelope(t_values):
-    amplitude = config.AMPLITUDE
-    base_frequency = config.BASE_FREQUENCY
-    smoothing_sigma = config.SMOOTHING_SIGMA
-    phase_shift = config.PHASE_SHIFT
-    
-    # Core sine wave component
-    sine_wave = amplitude * np.sin(base_frequency * np.log(t_values + 1) + phase_shift)
-    
-    # Center the envelope correctly
-    envelope = mu_t + AMPLITUDE * np.sin(BASE_FREQUENCY * np.log(t_values + 1) + PHASE_SHIFT)
+    # Calculate the envelope using the corrected amplitude and base frequency
+    mu_t = calculate_modular_drift(t_values)
+    envelope = mu_t + config.AMPLITUDE * np.sin(config.BASE_FREQUENCY * np.log(t_values + 1) + config.PHASE_SHIFT)
+    return envelope
 
-    # Optional smoothing to reduce noise
-    if smoothing_sigma > 0:
-        from scipy.ndimage import gaussian_filter1d
-        envelope_adjusted = gaussian_filter1d(envelope_adjusted, sigma=smoothing_sigma)
-    
-    return envelope_adjusted
-
-
-def run_sieve(t_values, delta_curve, envelope, tolerance):
-    # Find zeros where delta is within the envelope tolerance
+def run_sieve(t_values, delta_curve, envelope):
+    # Run the sieve to identify potential zeros
     detected_zeros = []
-    for i, (t, delta, env) in enumerate(zip(t_values, delta_curve, envelope)):
-        if abs(delta) <= tolerance * env:
+    for t, delta, env in zip(t_values, delta_curve, envelope):
+        if abs(delta - env) <= config.TOLERANCE:
             detected_zeros.append(t)
-    
     return detected_zeros
