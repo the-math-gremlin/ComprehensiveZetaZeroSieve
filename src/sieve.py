@@ -11,7 +11,7 @@ sigma = 5.0  # Smoothing Sigma
 epsilon = 0.875  # Tolerance
 
 # Load the known zeta zeros for overlay
-zeta_zeros = np.load('/mnt/data/zeta_zeros.npy')
+zeta_zeros = np.load('../data/zeta_zeros.npy')
 
 # Define the modular drift function without relying on preprocessed data
 def modular_drift(t):
