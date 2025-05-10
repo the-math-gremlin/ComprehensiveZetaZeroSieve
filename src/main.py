@@ -1,19 +1,29 @@
 import numpy as np
-from utils import load_data, run_basic_sieve
+from utils import calculate_modular_drift, calculate_envelope
 import config
 import os
 
 def main():
-    print("[INFO] Loading data files...")
-    delta_curve, dynamic_sine_envelope, within_band_mask = load_data()
-    print("[INFO] Running basic sieve...")
-    detected_zeros = run_basic_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, verbose=True)
+    # Load t values
+    t_values = np.arange(1, 100001, dtype=np.float64)
 
-    # Save detected zeros for verification
-    output_path = os.path.join("..", "data", "detected_zeros.npy")
-    np.save(output_path, np.array(detected_zeros, dtype=np.int64))
-    print(f"[INFO] Detected {len(detected_zeros)} potential zeros saved to {output_path}")
-    print("[INFO] Sieve complete.")
+    # Calculate the modular drift
+    delta_curve = calculate_modular_drift(t_values)
+
+    # Calculate the envelope
+    amplitude = config.AMPLITUDE
+    frequency = config.FREQUENCY
+    phase_shift = config.PHASE_SHIFT
+    smoothing_sigma = config.SMOOTHING_SIGMA
+
+    envelope, mu_t = calculate_envelope(delta_curve, t_values, amplitude, frequency, phase_shift, smoothing_sigma)
+
+    # Save the outputs for verification
+    np.save("../data/delta_curve.npy", delta_curve)
+    np.save("../data/dynamic_sine_envelope.npy", envelope)
+    np.save("../data/centerline.npy", mu_t)
+
+    print("[INFO] Drift and envelope calculated successfully.")
 
 if __name__ == "__main__":
     main()
