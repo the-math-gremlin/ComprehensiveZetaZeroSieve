@@ -5,7 +5,7 @@ AMPLITUDE = 12.2
 BASE_FREQUENCY = abs(1 / np.log(3) - 1 / np.log(np.pi))  # ≈ 0.001542
 SMOOTHING_SIGMA = 5.0
 TOLERANCE = 0.875
-PHASE_SHIFT = 0.0
+PHASE_SHIFT = 0.5
 
 
 # t-value generation
