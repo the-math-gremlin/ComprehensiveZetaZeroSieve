@@ -3,7 +3,7 @@ import config
 
 def calculate_modular_drift(t_values):
     # Calculate the modular drift function (Δ)
-    base_frequency = config.BASE_FREQUENCY
+    frequency = config.BASE_FREQUENCY
     phase_shift = config.PHASE_SHIFT
     mu_t = (2 * np.pi * base_frequency * np.log(t_values + 1)) / np.log(3) + phase_shift
     delta_curve = np.abs(np.mod(mu_t, 2 * np.pi) - np.pi)
