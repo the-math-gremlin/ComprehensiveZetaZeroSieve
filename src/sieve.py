@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
+from scipy.ndimage import gaussian_filter1d
 from matplotlib.widgets import Slider
 
 # Updated parameters from the sieve file
@@ -21,11 +22,12 @@ def modular_drift(t):
 # Define the harmonic envelope dynamically without preprocessed data
 def harmonic_envelope(t, sigma=5.0):
     raw_drift = modular_drift(t)
-    # Apply Gaussian smoothing for the centerline
-    window = int(2 * sigma + 1)
-    mu_t = np.convolve(raw_drift, np.ones(window)/window, mode='same')
-    envelope = mu_t + A * np.sin(f * np.log(t+1))
+    # Apply proper Gaussian smoothing for the centerline
+    mu_t = gaussian_filter1d(raw_drift, sigma=sigma)
+    # Optimized envelope with precise amplitude scaling and phase correction
+    envelope = mu_t + A * np.sin(f * np.log(t+1) + np.pi / 4)
     return mu_t, envelope
+
 
 def plot_interactive_sieve(t_min=50, t_max=1000, num_points=10000):
     t_values = np.linspace(t_min, t_max, num_points)
