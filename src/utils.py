@@ -7,22 +7,27 @@ def calculate_modular_drift(t_values):
     mu_t = (2 * np.pi * config.BASE_FREQUENCY * np.log(t_values + 1)) / np.log(3)
     return mu_t
 
-def calculate_envelope(t_values):
-    amplitude = config.AMPLITUDE
+def calculate_dynamic_envelope(t_values):
+    # Calculate the local mean (mu_t) using a Gaussian filter for dynamic centering
     base_frequency = config.BASE_FREQUENCY
+    amplitude = config.AMPLITUDE
     phase_shift = config.PHASE_SHIFT
+    smoothing_sigma = config.SMOOTHING_SIGMA
     
-    # Direct sine envelope calculation
+    # Calculate the raw sine wave
     sine_wave = amplitude * np.sin(base_frequency * np.log(t_values + 1) + phase_shift)
     
-    # Center the envelope around the mean of the sine wave
-    envelope = sine_wave + (amplitude / 2)
+    # Use a dynamic local smoothing for mu(t)
+    mu_t = gaussian_filter1d(sine_wave, sigma=smoothing_sigma)
     
-    # Optional smoothing
-    if config.SMOOTHING_SIGMA > 0:
-        envelope = gaussian_filter1d(envelope, sigma=config.SMOOTHING_SIGMA)
+    # Calculate the dynamic envelope
+    dynamic_envelope = mu_t + amplitude * np.sin(base_frequency * np.log(t_values + 1) + phase_shift)
     
-    return envelope
+    # Apply a second layer of smoothing for stability
+    if smoothing_sigma > 0:
+        dynamic_envelope = gaussian_filter1d(dynamic_envelope, sigma=smoothing_sigma)
+    
+    return np.abs(dynamic_envelope)
 
 def run_sieve(t_values, delta_curve, envelope, tolerance):
     # Run the sieve to identify potential zeros
