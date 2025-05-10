@@ -18,8 +18,8 @@ def calculate_envelope(t_values):
     sine_wave = amplitude * np.sin(frequency * np.log(t_values + 1) + phase_shift)
     
     # Center the envelope correctly around the target mean
-    mu_t = (2 * np.pi * frequency * np.log(t_values + 1)) / np.log(3)
-    envelope = np.abs(mu_t + sine_wave)
+    mu_t = amplitude / 2  # Use the midpoint of the amplitude as the center
+        envelope = mu_t + sine_wave
     
     return envelope
 
