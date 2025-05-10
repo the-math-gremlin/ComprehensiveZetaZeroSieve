@@ -24,7 +24,7 @@ def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, 
 
     # Compare known zeros to the reconstructed envelope
     for zero in zeta_zeros:
-        index = int(np.round(zero))
+        index = int(np.floor(zero))
         if index < len(envelope_reconstructed):
             delta_value = delta_curve[index]
             envelope_value = envelope_reconstructed[index]
