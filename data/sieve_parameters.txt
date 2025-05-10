@@ -1,5 +1,5 @@
-Amplitude: np.pi * abs(1 / np.log(3) - 1 / np.log(np.pi)) / 2
-Base_Frequency: abs(1 / np.log(3) - 1 / np.log(np.pi))
-Smoothing_Sigma: 5.0
-Tolerance: 0.875
-Phase_Shift: 0.0
+AMPLITUDE = 12.2
+BASE_FREQUENCY = 0.001
+SMOOTHING_SIGMA = 5.0
+TOLERANCE = 0.875
+PHASE_SHIFT = 0.0
