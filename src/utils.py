@@ -12,7 +12,7 @@ def calculate_modular_drift(t_values):
 def calculate_envelope(t_values):
     # Calculate the envelope function
     amplitude = config.AMPLITUDE
-    frequency = config.ENVELOPE_FREQUENCY
+    frequency = config.BASE_FREQUENCY
     envelope = amplitude * np.sin(frequency * np.log(t_values + 1))
     return np.abs(envelope)
 
