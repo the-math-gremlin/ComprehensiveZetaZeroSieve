@@ -16,9 +16,9 @@ def calculate_envelope(t_values):
     # Core sine wave component
     sine_wave = amplitude * np.sin(base_frequency * np.log(t_values + 1) + phase_shift)
     
-    # Dynamic envelope scaling
-    envelope_base = amplitude / 1.5  # Base scaling factor
-    envelope_adjusted = envelope_base + sine_wave
+    # Center the envelope correctly
+    envelope_center = amplitude / 2
+    envelope_adjusted = envelope_center + sine_wave
 
     # Optional smoothing to reduce noise
     if smoothing_sigma > 0:
@@ -26,6 +26,7 @@ def calculate_envelope(t_values):
         envelope_adjusted = gaussian_filter1d(envelope_adjusted, sigma=smoothing_sigma)
     
     return envelope_adjusted
+
 
 def run_sieve(t_values, delta_curve, envelope, tolerance):
     # Find zeros where delta is within the envelope tolerance
