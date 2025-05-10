@@ -2,21 +2,26 @@ import numpy as np
 
 # Load known zeros and t-values
 known_zeros = np.load("../data/zeta_zeros.npy")
-t_values = np.loadtxt("../data/t_values.txt")
+t_values = np.load("../data/t_values.npy")
 
 # Set parameters
 AMPLITUDE = np.pi * np.abs(1 / np.log(3) - 1 / np.log(np.pi))
-FREQUENCY = 1 / (2 * np.pi * np.log(3))
+FREQUENCY = np.abs(1 / np.log(3) - 1 / np.log(np.pi))
 PHASE_SHIFT = 0  # Set to zero for now, adjust later if needed
-TOLERANCE = 1e-10
+TOLERANCE = 0.875
 
 # Calculate delta curve
-delta_curve = np.abs(np.log(t_values / np.pi) - np.log(t_values / 3))
+theta_3 = 2 * np.pi * (np.log(t_values) / np.log(3) % 1)
+theta_pi = 2 * np.pi * (np.log(t_values) / np.log(np.pi) % 1)
+delta_curve = np.minimum(np.abs(theta_3 - theta_pi), 2 * np.pi - np.abs(theta_3 - theta_pi))
+
 print(f"[DEBUG] Delta Curve Length: {len(delta_curve)}")
 print(f"[DEBUG] Sample Delta Curve: {delta_curve[:10]}")
 
 # Calculate sine envelope
-envelope = AMPLITUDE * np.sin(2 * np.pi * FREQUENCY * np.log(t_values))
+mu_t = np.mean(delta_curve)  # Use a rough average for now, refine later
+envelope = mu_t + AMPLITUDE * np.sin(2 * np.pi * FREQUENCY * np.log(t_values) + PHASE_SHIFT)
+
 print(f"[DEBUG] Envelope Length: {len(envelope)}")
 print(f"[DEBUG] Sample Envelope: {envelope[:10]}")
 
