@@ -1,62 +1,56 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.signal import find_peaks
 from scipy.ndimage import gaussian_filter1d
-from matplotlib.widgets import Slider
 
-# Load the known zeta zeros
+# Load known zeta zeros
 zeta_zeros = np.load('zeta_zeros.npy')
 
-# Sieve parameters
-sigma = 0.5
-epsilon = 0.875
-A_global = 12.20
-phase_shift_global = -0.0100
-f_global = 0.001018
+# Sieve parameters from Deep Research
+sigma = 5.0  # Smoothing width for mu(t)
+A = 12.2  # Envelope amplitude (degrees)
+f = 0.001  # Envelope frequency
+phi = -0.0085  # Envelope phase shift
+epsilon = 0.875  # Envelope tolerance (degrees)
 
-# Define the globally consistent raw drift function
-def simple_global_raw_drift(t_values):
+# Define the raw modular drift function (Δ(t))
+def raw_drift(t_values):
     ln3 = np.log(3)
     lnpi = np.log(np.pi)
-    # Corrected modular difference without special baseline adjustments
-    drift = (2 * np.pi * (np.log(t_values) / ln3 - np.log(t_values) / lnpi)) % (2 * np.pi)
-    # Apply a conservative global baseline correction
-    baseline_correction = np.mean(drift) * 0.9  # Reduce correction strength to avoid early suppression
-    drift -= baseline_correction  # Apply baseline correction
-    # Ensure the drift is correctly scaled to 0-360 degrees
+    theta_3 = (2 * np.pi * np.log(t_values) / ln3) % (2 * np.pi)
+    theta_pi = (2 * np.pi * np.log(t_values) / lnpi) % (2 * np.pi)
+    drift = np.minimum(np.abs(theta_3 - theta_pi), 2 * np.pi - np.abs(theta_3 - theta_pi))
     drift_degrees = (drift / (2 * np.pi)) * 360
-    drift_degrees = np.mod(drift_degrees, 360)
     return drift_degrees
 
-# Generate the global raw drift
-delta_t_global = simple_global_raw_drift(zeta_zeros)
+# Generate the raw drift
+delta_t = raw_drift(zeta_zeros)
 
-# Apply Gaussian smoothing for the envelope centerline
-gauss_kernel_final = np.ones(5) / 5  # Simple moving average as a final smoothing
-mu_t_global = np.convolve(delta_t_global, gauss_kernel_final, mode='same')
+# Smooth the drift to obtain mu(t)
+mu_t = gaussian_filter1d(delta_t, sigma=sigma)
 
 # Generate the harmonic envelope
-envelope_t_global = mu_t_global + A_global * np.sin(f_global * np.log(zeta_zeros + 1) + phase_shift_global)
+envelope_t = mu_t + A * np.sin(f * np.log(zeta_zeros + 1) + phi)
 
 # Apply the final capture condition
-within_band_mask_global = np.abs(delta_t_global - envelope_t_global) <= epsilon
-captured_zeros_global = zeta_zeros[within_band_mask_global]
+within_band_mask = np.abs(delta_t - envelope_t) <= epsilon
+captured_zeros = zeta_zeros[within_band_mask]
 
 # Print final results
-captured_count_global = len(captured_zeros_global)
-first_10_captured_global = np.round(captured_zeros_global[:10], 8)
-last_10_captured_global = np.round(captured_zeros_global[-10:], 8)
+captured_count = len(captured_zeros)
+first_10_captured = np.round(captured_zeros[:10], 8)
+last_10_captured = np.round(captured_zeros[-10:], 8)
 
-print(f"Total Captured Zeros: {captured_count_global}")
-print(f"First 10 Captured Zeros: {first_10_captured_global}")
-print(f"Last 10 Captured Zeros: {last_10_captured_global}")
+print(f"Total Captured Zeros: {captured_count}")
+print(f"First 10 Captured Zeros: {first_10_captured}")
+print(f"Last 10 Captured Zeros: {last_10_captured}")
 
-# Optional: plot the final alignment for verification
+# Plot the drift, smoothed centerline, and envelope for verification
 plt.figure(figsize=(14, 8))
-plt.plot(zeta_zeros, delta_t_global, label="Δ(t) (Global Drift)", color="blue", alpha=0.7)
-plt.plot(zeta_zeros, mu_t_global, label="μ(t) (Smoothed Drift)", color="green", alpha=0.6, linestyle='--')
-plt.plot(zeta_zeros, envelope_t_global, label="E(t) (Harmonic Envelope)", color="orange", alpha=0.7)
-plt.title("Global Drift and Envelope Alignment")
+plt.plot(zeta_zeros, delta_t, label="Δ(t) (Raw Drift)", color="blue", alpha=0.7)
+plt.plot(zeta_zeros, mu_t, label="μ(t) (Smoothed Centerline)", color="green", alpha=0.6, linestyle='--')
+plt.plot(zeta_zeros, envelope_t, label="E(t) (Harmonic Envelope)", color="orange", alpha=0.7)
+plt.scatter(captured_zeros, delta_t[within_band_mask], color="red", s=10, label="Captured Zeros")
+plt.title("Final Drift and Envelope Alignment")
 plt.xlabel("t (Imaginary Part of Zero)")
 plt.ylabel("Modular Drift (degrees)")
 plt.legend()
