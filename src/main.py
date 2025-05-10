@@ -59,7 +59,7 @@ def run_sieve(delta_curve, dynamic_sine_envelope, within_band_mask, zeta_zeros, 
         print(f"True Positives: {true_positives}")
         print(f"False Positives: {len(false_positives)}")
         print(f"Missed Zeros: {len(missed_zeros)}")
-        print(f"False Positive Indices: {false_positives[:10]}")  # Print first 10 false positives
+        print(f"False Positive Indices: {[int(idx) for idx in false_positives[:10]]}")
 
     return true_positives, len(missed_zeros), len(false_positives), missed_zeros
 
