@@ -4,7 +4,7 @@ from math import exp, sqrt, pi
 
 # Load known zeta zeros (first 100,000 imaginary parts) and reference delta
 zeta_zeros = np.load("../data/zeta_zeros.npy")            # known nontrivial zeros
-delta_ref  = np.load("delta_curve.npy")           # reference raw drift Δ(t) from data
+delta_ref  = np.load("../data/delta_curve.npy")           # reference raw drift Δ(t) from data
 
 # Compute Riemann-Siegel theta approximately and accumulate phase difference
 def theta_asymptotic(t):
@@ -42,7 +42,7 @@ gauss_kernel /= gauss_kernel.sum()  # normalize
 
 # Convolve Δ with Gaussian kernel
 mu_computed = np.convolve(delta, gauss_kernel, mode='same')
-mu_ref = np.load("smoothed_delta.npy")
+mu_ref = np.load("../data/smoothed_delta.npy")
 print("Max deviation between computed μ and reference μ:",
       np.max(np.abs(mu_computed - mu_ref)))
 
@@ -53,7 +53,7 @@ A = 12.2
 f = 0.001
 # Compute envelope E(t) for each zero index
 envelope_computed = mu_computed + A * np.sin(f * np.log(zeta_zeros + 1))
-envelope_ref = np.load("dynamic_sine_envelope.npy")
+envelope_ref = np.load("../data/dynamic_sine_envelope.npy")
 print("Envelope difference (max):", np.max(np.abs(envelope_computed - envelope_ref)))
 
 print("Envelope E(t) first 10:", np.round(envelope_computed[:10], 5))
