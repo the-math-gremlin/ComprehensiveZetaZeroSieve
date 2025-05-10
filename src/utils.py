@@ -2,25 +2,36 @@ import numpy as np
 import config
 
 def calculate_modular_drift(t_values):
-    # Calculate the modular drift function (Δ)
-    frequency = config.BASE_FREQUENCY
+    base_frequency = config.BASE_FREQUENCY
     phase_shift = config.PHASE_SHIFT
-    mu_t = (2 * np.pi * frequency * np.log(t_values + 1)) / np.log(3) + phase_shift
-    delta_curve = np.abs(np.mod(mu_t, 2 * np.pi) - np.pi)
-    return delta_curve
+    mu_t = (2 * np.pi * base_frequency * np.log(t_values + 1)) / np.log(3) + phase_shift
+    return mu_t
 
 def calculate_envelope(t_values):
     amplitude = config.AMPLITUDE
-    frequency = config.BASE_FREQUENCY
+    base_frequency = config.BASE_FREQUENCY
+    smoothing_sigma = config.SMOOTHING_SIGMA
     phase_shift = config.PHASE_SHIFT
-
-    # Center the envelope around the average amplitude
-    sine_wave = amplitude * np.sin(frequency * np.log(t_values + 1) + phase_shift)
-    envelope = amplitude + sine_wave
     
-    return envelope
+    # Core sine wave component
+    sine_wave = amplitude * np.sin(base_frequency * np.log(t_values + 1) + phase_shift)
+    
+    # Dynamic envelope scaling
+    envelope_base = amplitude / 1.5  # Base scaling factor
+    envelope_adjusted = envelope_base + sine_wave
 
-def run_sieve(t_values, delta_curve, envelope, tolerance):
-    # Identify points where Δ is within the envelope
-    detected_zeros = t_values[np.abs(delta_curve) < envelope + tolerance]
+    # Optional smoothing to reduce noise
+    if smoothing_sigma > 0:
+        from scipy.ndimage import gaussian_filter1d
+        envelope_adjusted = gaussian_filter1d(envelope_adjusted, sigma=smoothing_sigma)
+    
+    return envelope_adjusted
+
+def run_sieve(delta_curve, envelope, tolerance):
+    # Find zeros where delta is within the envelope tolerance
+    detected_zeros = []
+    for i, (delta, env) in enumerate(zip(delta_curve, envelope)):
+        if abs(delta) <= tolerance * env:
+            detected_zeros.append(i)
+    
     return detected_zeros
